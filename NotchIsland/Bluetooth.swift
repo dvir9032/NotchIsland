@@ -13,6 +13,8 @@ final class BluetoothMonitor: NSObject {
     var onEvent: ((Event) -> Void)?
     private var startedAt = Date()
     private var connectNote: IOBluetoothUserNotification?
+    /// One disconnect registration per device address, so a flaky link can't stack duplicates.
+    private var disconnectNotes: [String: IOBluetoothUserNotification] = [:]
 
     func start() {
         startedAt = Date()
@@ -20,7 +22,10 @@ final class BluetoothMonitor: NSObject {
     }
 
     @objc private func connected(_ note: IOBluetoothUserNotification, device: IOBluetoothDevice) {
-        device.register(forDisconnectNotification: self, selector: #selector(disconnected(_:device:)))
+        let key = device.addressString ?? device.name ?? ""
+        if disconnectNotes[key] == nil {
+            disconnectNotes[key] = device.register(forDisconnectNotification: self, selector: #selector(disconnected(_:device:)))
+        }
         // Registration replays devices that were already connected; only announce real arrivals.
         guard Date().timeIntervalSince(startedAt) > 3 else { return }
         // Battery levels arrive a moment after the link comes up.
@@ -31,6 +36,7 @@ final class BluetoothMonitor: NSObject {
 
     @objc private func disconnected(_ note: IOBluetoothUserNotification, device: IOBluetoothDevice) {
         note.unregister()
+        disconnectNotes[device.addressString ?? device.name ?? ""] = nil
         onEvent?(Self.event(for: device, connected: false))
     }
 

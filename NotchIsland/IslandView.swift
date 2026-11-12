@@ -150,21 +150,73 @@ struct CompactView: View {
     }
 }
 
-struct EqualizerBars: View {
+/// Bouncing bars beside the notch. Core Animation runs them in the render server,
+/// so they cost the app ~nothing for as long as a song plays.
+struct EqualizerBars: NSViewRepresentable {
     let playing: Bool
     let color: Color
 
-    var body: some View {
-        TimelineView(.animation(minimumInterval: 1 / 30, paused: !playing)) { ctx in
-            let t = ctx.date.timeIntervalSinceReferenceDate
-            HStack(alignment: .center, spacing: 2) {
-                ForEach(0..<4, id: \.self) { i in
-                    let phase = Double(i) * 1.7
-                    let h = playing ? 0.3 + 0.7 * abs(sin(t * (3.1 + Double(i) * 0.9) + phase)) : 0.25
-                    Capsule().fill(color).frame(width: 2.6).frame(maxHeight: .infinity).scaleEffect(y: h)
-                }
+    final class BarsView: NSView {
+        private var bars: [CALayer] = []
+        private var animating = false
+
+        override init(frame: NSRect) {
+            super.init(frame: frame)
+            wantsLayer = true
+            for _ in 0..<4 {
+                let bar = CALayer()
+                bar.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+                layer?.addSublayer(bar)
+                bars.append(bar)
             }
         }
+
+        required init?(coder: NSCoder) { fatalError() }
+
+        override func layout() {
+            super.layout()
+            let w: CGFloat = 2.6, gap: CGFloat = 2
+            let total = w * CGFloat(bars.count) + gap * CGFloat(bars.count - 1)
+            var x = (bounds.width - total) / 2
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+            for bar in bars {
+                bar.bounds = CGRect(x: 0, y: 0, width: w, height: bounds.height)
+                bar.position = CGPoint(x: x + w / 2, y: bounds.midY)
+                bar.cornerRadius = w / 2
+                x += w + gap
+            }
+            CATransaction.commit()
+        }
+
+        func update(playing: Bool, color: NSColor) {
+            for bar in bars { bar.backgroundColor = color.cgColor }
+            guard playing != animating else { return }
+            animating = playing
+            for (i, bar) in bars.enumerated() {
+                bar.removeAllAnimations()
+                if playing {
+                    let a = CABasicAnimation(keyPath: "transform.scale.y")
+                    a.fromValue = 0.3
+                    a.toValue = 1.0
+                    a.duration = [0.42, 0.33, 0.51, 0.37][i]
+                    a.beginTime = CACurrentMediaTime() + Double(i) * 0.11
+                    a.autoreverses = true
+                    a.repeatCount = .infinity
+                    a.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+                    bar.add(a, forKey: "bounce")
+                } else {
+                    bar.transform = CATransform3DMakeScale(1, 0.25, 1)
+                }
+            }
+            if playing { for bar in bars { bar.transform = CATransform3DIdentity } }
+        }
+    }
+
+    func makeNSView(context: Context) -> BarsView { BarsView() }
+
+    func updateNSView(_ view: BarsView, context: Context) {
+        view.update(playing: playing, color: NSColor(color))
     }
 }
 

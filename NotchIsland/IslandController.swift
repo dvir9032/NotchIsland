@@ -191,9 +191,15 @@ final class IslandController {
         var r = islandRect()
         if model.draggingFiles {
             r = model.isOpen ? r.insetBy(dx: -40, dy: -40) : r.insetBy(dx: -90, dy: -110)
+        } else if model.isOpen {
+            // An open island forgives small overshoots.
+            r = r.insetBy(dx: -14, dy: -14)
         } else {
-            // Tolerances: the pointer can sit on the very top row, and an open island forgives small overshoots.
-            r = model.isOpen ? r.insetBy(dx: -14, dy: -14) : r.insetBy(dx: -6, dy: 0)
+            // Closed, only the notch itself opens the island: a live activity beside it sits over
+            // menu-bar items, and those must stay reachable.
+            let w = model.notch.width + model.topRadius * 2
+            r = NSRect(x: screen.frame.midX - w / 2, y: screen.frame.maxY - model.notch.height,
+                       width: w, height: model.notch.height).insetBy(dx: -4, dy: 0)
         }
         r.size.height += 4
         return r
@@ -219,7 +225,8 @@ final class IslandController {
                     self.open()
                 }
                 openWork = w
-                DispatchQueue.main.asyncAfter(deadline: .now() + (model.draggingFiles ? 0 : 0.12), execute: w)
+                // A short dwell, so passing through on the way to the menu bar doesn't open it.
+                DispatchQueue.main.asyncAfter(deadline: .now() + (model.draggingFiles ? 0 : 0.2), execute: w)
             }
         } else {
             openWork?.cancel()

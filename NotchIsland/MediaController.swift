@@ -33,6 +33,9 @@ final class MediaController: ObservableObject {
     private var process: Process?
     private var input: FileHandle?
     private var buffer = Data()
+    /// Back-to-back bridge failures; each one doubles the wait before the next try.
+    private var failures = 0
+    private var startedAt = Date()
 
     private static let script = """
     use DynaLoader;
@@ -62,20 +65,30 @@ final class MediaController: ObservableObject {
             DispatchQueue.main.async { self?.consume(chunk) }
         }
         p.terminationHandler = { [weak self] _ in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                self?.process = nil
-                self?.input = nil
-                self?.buffer.removeAll()
-                self?.start()
-            }
+            DispatchQueue.main.async { self?.bridgeExited() }
         }
         do {
             try p.run()
+            startedAt = Date()
             process = p
             input = inp.fileHandleForWriting
         } catch {
             NSLog("NotchIsland: perl bridge failed: \(error)")
         }
+    }
+
+    private func bridgeExited() {
+        process = nil
+        input = nil
+        buffer.removeAll()
+        // A bridge that ran a while was healthy; only quick deaths count as failures.
+        failures = Date().timeIntervalSince(startedAt) > 30 ? 0 : failures + 1
+        guard failures <= 6 else {
+            NSLog("NotchIsland: Now Playing bridge keeps failing, giving up")
+            return
+        }
+        let delay = min(120, 2 * pow(2, Double(max(0, failures - 1))))
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in self?.start() }
     }
 
     func stop() {
