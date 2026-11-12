@@ -18,7 +18,6 @@
 		9D6099109CEE6DD6A9193F11 /* IslandTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5D4FABA6D88E245D979CB8 /* IslandTimer.swift */; };
 		A7E47B73A68E22C671F79522 /* IslandView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFE68D383C94488BA45BEF6D /* IslandView.swift */; };
 		CE56484C0EF94ABD2E027379 /* IslandController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016B74E2AB0BE35D2E997D9A /* IslandController.swift */; };
-		CE80749442671AB8C5AEA55D /* SystemControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224BCB73F87718D3310ED6C /* SystemControls.swift */; };
 		FB08409187CE0AA1BC37037A /* NIHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 45078270344AEA49E45EBB9D /* NIHelper.m */; };
 /* End PBXBuildFile section */
 
@@ -35,7 +34,6 @@
 /* Begin PBXFileReference section */
 		016B74E2AB0BE35D2E997D9A /* IslandController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandController.swift; sourceTree = "<group>"; };
 		3FC8DC3815868478810D97B0 /* IslandModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandModel.swift; sourceTree = "<group>"; };
-		4224BCB73F87718D3310ED6C /* SystemControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemControls.swift; sourceTree = "<group>"; };
 		45078270344AEA49E45EBB9D /* NIHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NIHelper.m; sourceTree = "<group>"; };
 		4C197E0F0C5EFD033D2647A3 /* Battery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Battery.swift; sourceTree = "<group>"; };
 		5D875A49913E51457FDDC1F5 /* NotchIsland.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NotchIsland.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -89,7 +87,6 @@
 				F69ED8B674B990874EB94E63 /* MediaController.swift */,
 				E957B131A72AF57478AA6FE5 /* Mirror.swift */,
 				65529F977D8D961C3031CD48 /* Shelf.swift */,
-				4224BCB73F87718D3310ED6C /* SystemControls.swift */,
 			);
 			path = NotchIsland;
 			sourceTree = "<group>";
@@ -206,7 +203,6 @@
 				501DFAF927EBDBB28A7746C1 /* MediaController.swift in Sources */,
 				672328425230DCFE1C54207A /* Mirror.swift in Sources */,
 				61BA458B894AADDCE46BC497 /* Shelf.swift in Sources */,
-				CE80749442671AB8C5AEA55D /* SystemControls.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

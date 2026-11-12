@@ -4,7 +4,7 @@ import ServiceManagement
 
 final class IslandModel: ObservableObject {
     enum Activity: Equatable {
-        case music, timer, charging, lowBattery, timerDone, brightness, bluetooth
+        case music, timer, charging, lowBattery, timerDone, bluetooth
     }
 
     @Published var isOpen = false {
@@ -13,7 +13,6 @@ final class IslandModel: ObservableObject {
     @Published var showMirror = false {
         didSet { showMirror ? mirror.start() : mirror.stop() }
     }
-    @Published private(set) var hudLevel: Float = 0
     @Published private(set) var btEvent: BluetoothMonitor.Event?
     /// Slides the artwork after a swipe, as feedback.
     @Published var nudge: CGFloat = 0
@@ -47,31 +46,11 @@ final class IslandModel: ObservableObject {
 
     func startServices() {
         media.start()
-        SystemBrightness.observe { [weak self] level in self?.brightnessChanged(level) }
         bluetooth.onEvent = { [weak self] e in
             self?.btEvent = e
             self?.show(.bluetooth, for: 3.5)
         }
         bluetooth.start()
-    }
-
-    private var brightnessSamples: [(Date, Float)] = []
-    private var lastBrightness = SystemBrightness.value ?? 0
-
-    /// Auto-brightness drifts slowly; a key press moves ≥4% within half a second.
-    private func brightnessChanged(_ level: Float) {
-        let now = Date()
-        brightnessSamples.removeAll { now.timeIntervalSince($0.0) > 0.6 }
-        // Measure from where it rested before this burst of changes.
-        if brightnessSamples.isEmpty { brightnessSamples.append((now, lastBrightness)) }
-        lastBrightness = level
-        brightnessSamples.append((now, level))
-        brightnessSamples.removeAll { now.timeIntervalSince($0.0) > 0.6 }
-        let values = brightnessSamples.map(\.1)
-        let jump = (values.max() ?? level) - (values.min() ?? level)
-        guard !isOpen, jump >= 0.04 || flash == .brightness else { return }
-        hudLevel = level
-        show(.brightness, for: 1.6)
     }
 
     /// What the closed island shows beside the notch, most urgent first.
@@ -94,7 +73,6 @@ final class IslandModel: ObservableObject {
         case .music: return notch.height + 16
         case .timer, .timerDone: return 74
         case .charging, .lowBattery: return 64
-        case .brightness: return 104
         case .bluetooth: return 84
         }
     }

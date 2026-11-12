@@ -102,10 +102,6 @@ struct CompactView: View {
             Image(systemName: "bolt.fill").foregroundStyle(.green).font(.system(size: 14, weight: .bold))
         case .lowBattery:
             Image(systemName: "battery.25percent").foregroundStyle(.red).font(.system(size: 15))
-        case .brightness:
-            Image(systemName: model.hudLevel < 0.5 ? "sun.min.fill" : "sun.max.fill")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(.yellow)
         case .bluetooth:
             if let e = model.btEvent {
                 Image(systemName: Self.validSymbol(e.symbol))
@@ -136,8 +132,6 @@ struct CompactView: View {
             Text("\(model.battery.level)%").font(.system(size: 13, weight: .semibold).monospacedDigit()).foregroundStyle(.green)
         case .lowBattery:
             Text("\(model.battery.level)%").font(.system(size: 13, weight: .semibold).monospacedDigit()).foregroundStyle(.red)
-        case .brightness:
-            LevelBar(level: model.hudLevel, color: .yellow)
         case .bluetooth:
             if let e = model.btEvent {
                 Group {
@@ -153,22 +147,6 @@ struct CompactView: View {
                 .help(e.name)
             }
         }
-    }
-}
-
-struct LevelBar: View {
-    let level: Float
-    let color: Color
-
-    var body: some View {
-        ZStack(alignment: .leading) {
-            Capsule().fill(Color.white.opacity(0.18))
-            GeometryReader { g in
-                Capsule().fill(color).frame(width: g.size.width * CGFloat(min(1, max(0, level))))
-            }
-        }
-        .frame(width: 72, height: 5)
-        .animation(.spring(response: 0.25, dampingFraction: 0.85), value: level)
     }
 }
 
