@@ -23,6 +23,8 @@ final class IslandController {
     private var openWork: DispatchWorkItem?
     private var closeWork: DispatchWorkItem?
     private var pinnedOpen = false
+    private var dragPoll: Timer?
+    private var dragStartCount = 0
 
     private static let canvas = CGSize(width: 780, height: 240)
 
@@ -52,6 +54,11 @@ final class IslandController {
         }
         if let l = NSEvent.addLocalMonitorForEvents(matching: events, handler: { [weak self] e in self?.track(); return e }) {
             monitors.append(l)
+        }
+        // File drags from Finder don't reliably reach event monitors, so watch the drag pasteboard
+        // from mouse-down until release.
+        if let d = NSEvent.addGlobalMonitorForEvents(matching: .leftMouseDown, handler: { [weak self] _ in self?.watchForDrag() }) {
+            monitors.append(d)
         }
         NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main) { [weak self] _ in
             self?.screenChanged()
@@ -92,14 +99,53 @@ final class IslandController {
         return NSRect(x: f.midX - s.width / 2, y: f.maxY - s.height, width: s.width, height: s.height)
     }
 
+    // MARK: File drags
+
+    private func watchForDrag() {
+        dragStartCount = NSPasteboard(name: .drag).changeCount
+        dragPoll?.invalidate()
+        dragPoll = Timer.scheduledTimer(withTimeInterval: 1 / 30, repeats: true) { [weak self] _ in self?.dragTick() }
+    }
+
+    private func dragTick() {
+        guard NSEvent.pressedMouseButtons & 1 != 0 else {
+            dragPoll?.invalidate()
+            dragPoll = nil
+            if model.draggingFiles {
+                // Let the drop land before the zone shrinks back.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
+                    self?.model.draggingFiles = false
+                    self?.track()
+                }
+            }
+            return
+        }
+        if !model.draggingFiles {
+            let pb = NSPasteboard(name: .drag)
+            guard pb.changeCount != dragStartCount, pb.types?.contains(.fileURL) == true else { return }
+            model.draggingFiles = true
+        }
+        track()
+    }
+
+    /// Where the pointer counts as "on the island". While files are dragged the zone is generous,
+    /// so a drag aimed roughly at the notch is enough.
+    private func hoverZone() -> NSRect {
+        var r = islandRect()
+        if model.draggingFiles {
+            r = model.isOpen ? r.insetBy(dx: -40, dy: -40) : r.insetBy(dx: -90, dy: -110)
+        } else {
+            // Tolerances: the pointer can sit on the very top row, and an open island forgives small overshoots.
+            r = model.isOpen ? r.insetBy(dx: -14, dy: -14) : r.insetBy(dx: -6, dy: 0)
+        }
+        r.size.height += 4
+        return r
+    }
+
     private func track() {
         guard !pinnedOpen else { return }
         let p = NSEvent.mouseLocation
-        var r = islandRect()
-        // Tolerances: the pointer can sit on the very top row, and an open island forgives small overshoots.
-        r = model.isOpen ? r.insetBy(dx: -14, dy: -14) : r.insetBy(dx: -6, dy: 0)
-        r.size.height += 4
-        let inside = r.contains(p)
+        let inside = hoverZone().contains(p)
         panel.ignoresMouseEvents = !inside
 
         if inside {
@@ -112,7 +158,7 @@ final class IslandController {
                     self.open()
                 }
                 openWork = w
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.12, execute: w)
+                DispatchQueue.main.asyncAfter(deadline: .now() + (model.draggingFiles ? 0 : 0.12), execute: w)
             }
         } else {
             openWork?.cancel()
@@ -139,9 +185,7 @@ final class IslandController {
     }
 
     private func isPointerNearIsland() -> Bool {
-        var r = islandRect().insetBy(dx: -6, dy: 0)
-        r.size.height += 4
-        return r.contains(NSEvent.mouseLocation)
+        hoverZone().contains(NSEvent.mouseLocation)
     }
 
     private func startPolling() {

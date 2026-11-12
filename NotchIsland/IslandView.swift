@@ -53,13 +53,16 @@ struct IslandView: View {
         .frame(width: size.width, height: size.height)
         .contentShape(shape)
         .onTapGesture { if !model.isOpen { model.isOpen = true } }
-        .onDrop(of: [.fileURL], isTargeted: $model.dropTargeted) { model.shelf.handleDrop($0) }
         .contextMenu {
             Button(model.launchesAtLogin ? "✓ הפעלה עם ההתחברות" : "הפעלה עם ההתחברות") { model.toggleLaunchAtLogin() }
             Divider()
             Button("יציאה מהאי הדינמי") { NSApp.terminate(nil) }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        // The whole canvas takes drops, so near-misses around the island still land on the shelf.
+        // The panel only accepts the mouse inside the controller's hover zone anyway.
+        .contentShape(Rectangle())
+        .onDrop(of: [.fileURL], isTargeted: $model.dropTargeted) { model.shelf.handleDrop($0) }
         .animation(.spring(response: 0.42, dampingFraction: 0.78), value: model.isOpen)
         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: model.activity)
         .preferredColorScheme(.dark)
@@ -169,6 +172,22 @@ struct ExpandedView: View {
         VStack(spacing: 0) {
             HeaderRow(model: model)
                 .frame(height: model.notch.height)
+            if model.draggingFiles {
+                DropZone(targeted: model.dropTargeted, count: model.shelf.items.count)
+                    .padding(.top, 10)
+                    .padding(.bottom, 18)
+                    .padding(.horizontal, 22)
+            } else {
+                cards
+            }
+        }
+        .padding(.horizontal, model.topRadius)
+        .foregroundStyle(.white)
+        .environment(\.layoutDirection, .rightToLeft)
+        .animation(.easeOut(duration: 0.18), value: model.draggingFiles)
+    }
+
+    private var cards: some View {
             HStack(alignment: .top, spacing: 16) {
                 MediaCard(media: model.media)
                     .frame(width: 300)
@@ -181,10 +200,33 @@ struct ExpandedView: View {
             .padding(.top, 12)
             .padding(.bottom, 18)
             .padding(.horizontal, 22)
-        }
-        .padding(.horizontal, model.topRadius)
-        .foregroundStyle(.white)
-        .environment(\.layoutDirection, .rightToLeft)
+    }
+}
+
+struct DropZone: View {
+    let targeted: Bool
+    let count: Int
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: 18, style: .continuous)
+            .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [7, 5]))
+            .foregroundStyle(targeted ? Color.accentColor : .white.opacity(0.3))
+            .background(Color.accentColor.opacity(targeted ? 0.2 : 0.06), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .overlay {
+                VStack(spacing: 6) {
+                    Image(systemName: "tray.and.arrow.down.fill")
+                        .font(.system(size: 30))
+                        .symbolEffect(.bounce, value: targeted)
+                    Text(targeted ? "שחרר כדי לשים במדף" : "גרור לכאן כדי לשמור במדף")
+                        .font(.system(size: 14, weight: .semibold))
+                    if count > 0 {
+                        Text("כבר במדף: \(count)").font(.system(size: 11)).foregroundStyle(.white.opacity(0.5))
+                    }
+                }
+                .foregroundStyle(targeted ? .white : .white.opacity(0.7))
+            }
+            .scaleEffect(targeted ? 1.02 : 1)
+            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: targeted)
     }
 }
 

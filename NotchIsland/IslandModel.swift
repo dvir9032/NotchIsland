@@ -9,6 +9,7 @@ final class IslandModel: ObservableObject {
 
     @Published var isOpen = false
     @Published var dropTargeted = false
+    @Published var draggingFiles = false
     @Published private(set) var flash: Activity?
     @Published var notch: CGSize
 
