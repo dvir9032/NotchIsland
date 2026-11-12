@@ -44,15 +44,32 @@ final class Mirror: ObservableObject {
 struct MirrorPreview: NSViewRepresentable {
     let session: AVCaptureSession
 
-    func makeNSView(context: Context) -> NSView {
-        let v = NSView()
-        let layer = AVCaptureVideoPreviewLayer(session: session)
-        layer.videoGravity = .resizeAspectFill
-        layer.transform = CATransform3DMakeScale(-1, 1, 1)  // a mirror, not a camera
-        v.layer = layer
-        v.wantsLayer = true
-        return v
+    final class PreviewView: NSView {
+        let preview: AVCaptureVideoPreviewLayer
+
+        init(session: AVCaptureSession) {
+            preview = AVCaptureVideoPreviewLayer(session: session)
+            super.init(frame: .zero)
+            wantsLayer = true
+            layer?.backgroundColor = NSColor.black.cgColor
+            preview.videoGravity = .resizeAspectFill
+            preview.setAffineTransform(CGAffineTransform(scaleX: -1, y: 1))  // a mirror, not a camera
+            layer?.addSublayer(preview)
+        }
+
+        required init?(coder: NSCoder) { fatalError() }
+
+        override func layout() {
+            super.layout()
+            // bounds + position, not frame: the layer carries a flip transform.
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+            preview.bounds = bounds
+            preview.position = CGPoint(x: bounds.midX, y: bounds.midY)
+            CATransaction.commit()
+        }
     }
 
-    func updateNSView(_ nsView: NSView, context: Context) {}
+    func makeNSView(context: Context) -> PreviewView { PreviewView(session: session) }
+    func updateNSView(_ nsView: PreviewView, context: Context) {}
 }

@@ -36,6 +36,8 @@ struct IslandView: View {
         ZStack(alignment: .top) {
             shape
                 .fill(Color.black)
+                // Idle, the hardware notch is already black; drawing over it only shows our outline.
+                .opacity(model.isOpen || model.activity != nil ? 1 : 0)
                 .shadow(color: .black.opacity(model.isOpen ? 0.5 : 0), radius: 16, y: 8)
             Group {
                 if model.isOpen {
@@ -55,9 +57,6 @@ struct IslandView: View {
         .onTapGesture { if !model.isOpen { model.isOpen = true } }
         .contextMenu {
             Button(model.launchesAtLogin ? "✓ הפעלה עם ההתחברות" : "הפעלה עם ההתחברות") { model.toggleLaunchAtLogin() }
-            if !model.keys.isActive {
-                Button("הפעל ווליום ובהירות בנוצ'…") { model.requestKeyAccess() }
-            }
             Divider()
             Button("יציאה מהאי הדינמי") { NSApp.terminate(nil) }
         }
@@ -103,10 +102,6 @@ struct CompactView: View {
             Image(systemName: "bolt.fill").foregroundStyle(.green).font(.system(size: 14, weight: .bold))
         case .lowBattery:
             Image(systemName: "battery.25percent").foregroundStyle(.red).font(.system(size: 15))
-        case .volume:
-            Image(systemName: model.hudMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(model.hudLevel))
-                .font(.system(size: 13, weight: .semibold))
-                .contentTransition(.symbolEffect(.replace))
         case .brightness:
             Image(systemName: model.hudLevel < 0.5 ? "sun.min.fill" : "sun.max.fill")
                 .font(.system(size: 14, weight: .semibold))
@@ -141,8 +136,6 @@ struct CompactView: View {
             Text("\(model.battery.level)%").font(.system(size: 13, weight: .semibold).monospacedDigit()).foregroundStyle(.green)
         case .lowBattery:
             Text("\(model.battery.level)%").font(.system(size: 13, weight: .semibold).monospacedDigit()).foregroundStyle(.red)
-        case .volume:
-            LevelBar(level: model.hudMuted ? 0 : model.hudLevel, color: .white)
         case .brightness:
             LevelBar(level: model.hudLevel, color: .yellow)
         case .bluetooth:
@@ -238,8 +231,9 @@ struct ExpandedView: View {
                 .padding(.horizontal, 22)
             } else if model.showMirror {
                 MirrorCard(model: model)
-                    .padding(.top, 10)
-                    .padding(.bottom, 18)
+                    .padding(.top, 6)
+                    .padding(.bottom, 16)
+                    .padding(.horizontal, 16)
             } else {
                 cards
             }
@@ -254,7 +248,6 @@ struct ExpandedView: View {
             HStack(alignment: .top, spacing: 16) {
                 MediaCard(media: model.media, nudge: model.nudge)
                     .frame(width: 300)
-                    .onGeometryChange(for: CGRect.self, of: { $0.frame(in: .global) }) { model.mediaFrame = $0 }
                 Divider().overlay(Color.white.opacity(0.08))
                 TimerCard(timer: model.timer)
                     .frame(width: 118)
@@ -317,9 +310,8 @@ struct MirrorCard: View {
                 .foregroundStyle(.white.opacity(0.7))
             } else {
                 MirrorPreview(session: mirror.session)
-                    .frame(width: 206, height: 116)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             }
         }
     }
@@ -357,29 +349,38 @@ struct HeaderRow: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            TimelineView(.periodic(from: .now, by: 15)) { ctx in
-                Text(ctx.date.formatted(.dateTime.weekday(.wide).day().month(.wide).locale(Locale(identifier: "he_IL"))))
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.75))
-            }
-            Button {
-                withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) { model.showMirror.toggle() }
-            } label: {
-                Image(systemName: model.showMirror ? "xmark.circle.fill" : "web.camera")
-                    .font(.system(size: 13))
-                    .foregroundStyle(.white.opacity(model.showMirror ? 0.9 : 0.6))
-                    .frame(width: 26, height: 22)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(PressStyle())
-            .help(model.showMirror ? "סגור מראה" : "מראה")
-            .padding(.leading, 6)
-            Spacer(minLength: model.notch.width + 24)
-            if model.battery.hasBattery {
-                BatteryBadge(battery: model.battery)
+            if model.showMirror {
+                // The mirror island is narrow: only the close button fits beside the notch.
+                mirrorButton
+                Spacer(minLength: model.notch.width)
+            } else {
+                TimelineView(.periodic(from: .now, by: 15)) { ctx in
+                    Text(ctx.date.formatted(.dateTime.weekday(.wide).day().month(.wide).locale(Locale(identifier: "he_IL"))))
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.75))
+                }
+                mirrorButton.padding(.leading, 6)
+                Spacer(minLength: model.notch.width + 24)
+                if model.battery.hasBattery {
+                    BatteryBadge(battery: model.battery)
+                }
             }
         }
-        .padding(.horizontal, 24)
+        .padding(.horizontal, model.showMirror ? 16 : 24)
+    }
+
+    private var mirrorButton: some View {
+        Button {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.82)) { model.showMirror.toggle() }
+        } label: {
+            Image(systemName: model.showMirror ? "xmark.circle.fill" : "web.camera")
+                .font(.system(size: 13))
+                .foregroundStyle(.white.opacity(model.showMirror ? 0.9 : 0.6))
+                .frame(width: 26, height: 22)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(PressStyle())
+        .help(model.showMirror ? "סגור מראה" : "מראה")
     }
 }
 

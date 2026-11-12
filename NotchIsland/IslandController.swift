@@ -30,7 +30,7 @@ final class IslandController {
     /// After a swipe-up closes the island, don't reopen it until the pointer leaves.
     private var holdClosed = false
 
-    private static let canvas = CGSize(width: 780, height: 240)
+    private static let canvas = CGSize(width: 780, height: 260)
 
     init() {
         screen = Self.pickScreen()
@@ -128,7 +128,7 @@ final class IslandController {
 
         let horizontal = abs(swipe.dx) > 55 && abs(swipe.dx) > abs(swipe.dy) * 1.5
         let up = swipe.dy < -45 && abs(swipe.dy) > abs(swipe.dx) * 1.5
-        if horizontal, model.media.track != nil, overMediaCard(e) {
+        if horizontal, model.media.track != nil, !model.showMirror, overPlayer() {
             swipeFired = true
             let toNext = swipe.dx < 0  // fingers to the left, like flicking a card away
             toNext ? model.media.next() : model.media.previous()
@@ -149,11 +149,11 @@ final class IslandController {
         return e
     }
 
-    private func overMediaCard(_ e: NSEvent) -> Bool {
-        guard let view = panel.contentView else { return false }
-        let p = view.convert(e.locationInWindow, from: nil)
-        let flipped = CGPoint(x: p.x, y: view.isFlipped ? p.y : view.bounds.height - p.y)
-        return model.mediaFrame.insetBy(dx: -10, dy: -10).contains(flipped)
+    /// The player is the right-hand column of the open island (the layout is right-to-left);
+    /// the shelf on the left keeps its own horizontal scrolling.
+    private func overPlayer() -> Bool {
+        let r = islandRect()
+        return NSEvent.mouseLocation.x > r.maxX - model.topRadius - 360
     }
 
     // MARK: File drags

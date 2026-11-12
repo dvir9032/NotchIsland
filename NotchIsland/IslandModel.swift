@@ -4,7 +4,7 @@ import ServiceManagement
 
 final class IslandModel: ObservableObject {
     enum Activity: Equatable {
-        case music, timer, charging, lowBattery, timerDone, volume, brightness, bluetooth
+        case music, timer, charging, lowBattery, timerDone, brightness, bluetooth
     }
 
     @Published var isOpen = false {
@@ -14,12 +14,9 @@ final class IslandModel: ObservableObject {
         didSet { showMirror ? mirror.start() : mirror.stop() }
     }
     @Published private(set) var hudLevel: Float = 0
-    @Published private(set) var hudMuted = false
     @Published private(set) var btEvent: BluetoothMonitor.Event?
     /// Slides the artwork after a swipe, as feedback.
     @Published var nudge: CGFloat = 0
-    /// The media card's frame in the hosting view (SwiftUI global space), for swipe hit-testing.
-    var mediaFrame: CGRect = .zero
     @Published var dropTargeted = false
     @Published var draggingFiles = false
     @Published private(set) var flash: Activity?
@@ -29,7 +26,6 @@ final class IslandModel: ObservableObject {
     let battery = BatteryMonitor()
     let timer = IslandTimer()
     let shelf = Shelf()
-    let keys = MediaKeyTap()
     let bluetooth = BluetoothMonitor()
     let mirror = Mirror()
 
@@ -51,20 +47,7 @@ final class IslandModel: ObservableObject {
 
     func startServices() {
         media.start()
-        keys.onChange = { [weak self] kind, level, muted in
-            self?.showHUD(kind == .volume ? .volume : .brightness, level: level, muted: muted)
-        }
-        let asked = UserDefaults.standard.bool(forKey: "askedAccessibility")
-        keys.start(prompt: !asked)
-        UserDefaults.standard.set(true, forKey: "askedAccessibility")
-        // Volume changed elsewhere (Control Center, another app) still shows the island's HUD.
-        var last = (SystemAudio.volume ?? 0, SystemAudio.isMuted)
-        SystemAudio.observe { [weak self] in
-            let now = (SystemAudio.volume ?? 0, SystemAudio.isMuted)
-            guard now != last else { return }
-            last = now
-            self?.showHUD(.volume, level: now.0, muted: now.1)
-        }
+        SystemBrightness.observe { [weak self] level in self?.brightnessChanged(level) }
         bluetooth.onEvent = { [weak self] e in
             self?.btEvent = e
             self?.show(.bluetooth, for: 3.5)
@@ -72,16 +55,23 @@ final class IslandModel: ObservableObject {
         bluetooth.start()
     }
 
-    private func showHUD(_ a: Activity, level: Float, muted: Bool) {
-        guard !isOpen else { return }
-        hudLevel = level
-        hudMuted = muted
-        show(a, for: 1.6)
-    }
+    private var brightnessSamples: [(Date, Float)] = []
+    private var lastBrightness = SystemBrightness.value ?? 0
 
-    func requestKeyAccess() {
-        keys.start(prompt: true)
-        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)
+    /// Auto-brightness drifts slowly; a key press moves ≥4% within half a second.
+    private func brightnessChanged(_ level: Float) {
+        let now = Date()
+        brightnessSamples.removeAll { now.timeIntervalSince($0.0) > 0.6 }
+        // Measure from where it rested before this burst of changes.
+        if brightnessSamples.isEmpty { brightnessSamples.append((now, lastBrightness)) }
+        lastBrightness = level
+        brightnessSamples.append((now, level))
+        brightnessSamples.removeAll { now.timeIntervalSince($0.0) > 0.6 }
+        let values = brightnessSamples.map(\.1)
+        let jump = (values.max() ?? level) - (values.min() ?? level)
+        guard !isOpen, jump >= 0.04 || flash == .brightness else { return }
+        hudLevel = level
+        show(.brightness, for: 1.6)
     }
 
     /// What the closed island shows beside the notch, most urgent first.
@@ -97,13 +87,14 @@ final class IslandModel: ObservableObject {
     var topRadius: CGFloat { isOpen ? 14 : 6 }
     var bottomRadius: CGFloat { isOpen ? 28 : 10 }
     static let openBody = CGSize(width: 640, height: 146)
+    static let mirrorBody = CGSize(width: 340, height: 196)
 
     func sideWidth(for a: Activity) -> CGFloat {
         switch a {
         case .music: return notch.height + 16
         case .timer, .timerDone: return 74
         case .charging, .lowBattery: return 64
-        case .volume, .brightness: return 104
+        case .brightness: return 104
         case .bluetooth: return 84
         }
     }
@@ -111,7 +102,8 @@ final class IslandModel: ObservableObject {
     /// Full island size, including the flared top corners.
     var size: CGSize {
         if isOpen {
-            return CGSize(width: Self.openBody.width + topRadius * 2, height: notch.height + Self.openBody.height)
+            let body = showMirror && !draggingFiles ? Self.mirrorBody : Self.openBody
+            return CGSize(width: body.width + topRadius * 2, height: notch.height + body.height)
         }
         let side = activity.map(sideWidth(for:)) ?? 0
         return CGSize(width: notch.width + side * 2 + topRadius * 2, height: notch.height)
