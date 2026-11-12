@@ -17,6 +17,14 @@ final class Shelf: ObservableObject {
         save()
     }
 
+    /// Forget files that were moved or deleted since they were parked.
+    func pruneMissing() {
+        let alive = items.filter { FileManager.default.fileExists(atPath: $0.path) }
+        guard alive.count != items.count else { return }
+        items = alive
+        save()
+    }
+
     func remove(_ url: URL) {
         items.removeAll { $0 == url }
         save()

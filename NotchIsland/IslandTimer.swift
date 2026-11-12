@@ -3,11 +3,32 @@ import AppKit
 final class IslandTimer: ObservableObject {
     @Published private(set) var end: Date?
     @Published private(set) var total: TimeInterval = 0
+    /// The custom duration picked with − / +, remembered between runs.
+    @Published var customMinutes: Int = UserDefaults.standard.object(forKey: "timerCustomMinutes") as? Int ?? 15 {
+        didSet { UserDefaults.standard.set(customMinutes, forKey: "timerCustomMinutes") }
+    }
 
     var onFinish: (() -> Void)?
     var isRunning: Bool { end != nil }
 
     private var ticker: Timer?
+
+    init() {
+        // A timer survives a relaunch or a restart, as long as it hasn't run out meanwhile.
+        let d = UserDefaults.standard
+        if let saved = d.object(forKey: "timerEnd") as? Date, saved > Date() {
+            end = saved
+            total = d.double(forKey: "timerTotal")
+            schedule()
+        }
+    }
+
+    /// Steps of 1 minute up to 10, then 5 up to 60, then 15.
+    func adjustCustom(up: Bool) {
+        let m = customMinutes
+        let step = up ? (m < 10 ? 1 : m < 60 ? 5 : 15) : (m <= 10 ? 1 : m <= 60 ? 5 : 15)
+        customMinutes = min(180, max(1, m + (up ? step : -step)))
+    }
 
     func start(minutes: Double) {
         total = minutes * 60
@@ -25,6 +46,7 @@ final class IslandTimer: ObservableObject {
     func cancel() {
         ticker?.invalidate()
         end = nil
+        persist()
     }
 
     func remaining(at now: Date = Date()) -> TimeInterval {
@@ -37,11 +59,23 @@ final class IslandTimer: ObservableObject {
 
     private func schedule() {
         ticker?.invalidate()
+        persist()
         guard let end else { return }
         ticker = Timer.scheduledTimer(withTimeInterval: max(0.05, end.timeIntervalSinceNow), repeats: false) { [weak self] _ in
             self?.end = nil
+            self?.persist()
             NSSound(named: "Glass")?.play()
             self?.onFinish?()
+        }
+    }
+
+    private func persist() {
+        let d = UserDefaults.standard
+        if let end {
+            d.set(end, forKey: "timerEnd")
+            d.set(total, forKey: "timerTotal")
+        } else {
+            d.removeObject(forKey: "timerEnd")
         }
     }
 

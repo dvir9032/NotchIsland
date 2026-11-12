@@ -8,7 +8,9 @@ final class IslandModel: ObservableObject {
     }
 
     @Published var isOpen = false {
-        didSet { if !isOpen { showMirror = false } }
+        didSet {
+            if isOpen { shelf.pruneMissing() } else { showMirror = false }
+        }
     }
     @Published var showMirror = false {
         didSet { showMirror ? mirror.start() : mirror.stop() }
@@ -27,6 +29,7 @@ final class IslandModel: ObservableObject {
     let shelf = Shelf()
     let bluetooth = BluetoothMonitor()
     let mirror = Mirror()
+    private let settings = SettingsWindow()
 
     private var bag = Set<AnyCancellable>()
     private var flashWork: DispatchWorkItem?
@@ -38,8 +41,13 @@ final class IslandModel: ObservableObject {
             child.receive(on: DispatchQueue.main).sink { [weak self] in self?.objectWillChange.send() }.store(in: &bag)
         }
         battery.onPowerChange = { [weak self] plugged in
-            if plugged { self?.show(.charging, for: 3.5) }
+            if plugged, Prefs.showBattery { self?.show(.charging, for: 3.5) }
         }
+        // Settings changes re-render the island at once.
+        NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.objectWillChange.send() }
+            .store(in: &bag)
         battery.$level.sink { [weak self] level in self?.checkLow(level) }.store(in: &bag)
         timer.onFinish = { [weak self] in self?.show(.timerDone, for: 8) }
     }
@@ -47,6 +55,7 @@ final class IslandModel: ObservableObject {
     func startServices() {
         media.start()
         bluetooth.onEvent = { [weak self] e in
+            guard Prefs.showBluetooth else { return }
             self?.btEvent = e
             self?.show(.bluetooth, for: 3.5)
         }
@@ -56,8 +65,8 @@ final class IslandModel: ObservableObject {
     /// What the closed island shows beside the notch, most urgent first.
     var activity: Activity? {
         if let flash { return flash }
-        if timer.isRunning { return .timer }
-        if media.isPlaying { return .music }
+        if timer.isRunning, Prefs.showTimer { return .timer }
+        if media.isPlaying, Prefs.showMusic { return .music }
         return nil
     }
 
@@ -109,9 +118,14 @@ final class IslandModel: ObservableObject {
         }
         for threshold in [20, 10, 5] where level <= threshold && lastLowWarning > threshold {
             lastLowWarning = threshold
-            DispatchQueue.main.async { self.show(.lowBattery, for: 4) }
+            if Prefs.showBattery { DispatchQueue.main.async { self.show(.lowBattery, for: 4) } }
             return
         }
+    }
+
+    func openSettings() {
+        isOpen = false
+        settings.show(model: self)
     }
 
     // MARK: Login item

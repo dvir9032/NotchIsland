@@ -23,6 +23,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    /// Opening the app again (Spotlight, Finder) while it runs brings up the settings.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        controller?.model.openSettings()
+        return false
+    }
+
     func applicationWillTerminate(_ notification: Notification) {
         controller?.model.media.stop()
         controller?.model.mirror.stop()

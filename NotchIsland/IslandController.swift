@@ -226,7 +226,7 @@ final class IslandController {
                 }
                 openWork = w
                 // A short dwell, so passing through on the way to the menu bar doesn't open it.
-                DispatchQueue.main.asyncAfter(deadline: .now() + (model.draggingFiles ? 0 : 0.2), execute: w)
+                DispatchQueue.main.asyncAfter(deadline: .now() + (model.draggingFiles ? 0 : Prefs.hoverDelay), execute: w)
             }
         } else {
             openWork?.cancel()

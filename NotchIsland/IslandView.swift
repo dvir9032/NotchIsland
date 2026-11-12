@@ -56,6 +56,7 @@ struct IslandView: View {
         .contentShape(shape)
         .onTapGesture { if !model.isOpen { model.isOpen = true } }
         .contextMenu {
+            Button("הגדרות…") { model.openSettings() }
             Button(model.launchesAtLogin ? "✓ הפעלה עם ההתחברות" : "הפעלה עם ההתחברות") { model.toggleLaunchAtLogin() }
             Divider()
             Button("יציאה מהאי הדינמי") { NSApp.terminate(nil) }
@@ -389,7 +390,9 @@ struct HeaderRow: View {
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(.white.opacity(0.75))
                 }
-                mirrorButton.padding(.leading, 6)
+                if Prefs.showMirrorButton {
+                    mirrorButton.padding(.leading, 6)
+                }
                 Spacer(minLength: model.notch.width + 24)
                 if model.battery.hasBattery {
                     BatteryBadge(battery: model.battery)
@@ -590,27 +593,59 @@ struct TimerCard: View {
                     Chip(title: "עצור", tint: .red) { timer.cancel() }
                 }
             } else {
-                LazyVGrid(columns: [GridItem(.flexible(), spacing: 6), GridItem(.flexible(), spacing: 6)], spacing: 6) {
+                HStack(spacing: 4) {
+                    StepButton(symbol: "minus") { timer.adjustCustom(up: false) }
+                    Text("\(timer.customMinutes)")
+                        .font(.system(size: 20, weight: .semibold).monospacedDigit())
+                        .contentTransition(.numericText())
+                        .animation(.snappy, value: timer.customMinutes)
+                        .frame(maxWidth: .infinity)
+                    StepButton(symbol: "plus") { timer.adjustCustom(up: true) }
+                    StepButton(symbol: "play.fill", tint: .orange) { timer.start(minutes: Double(timer.customMinutes)) }
+                }
+                .environment(\.layoutDirection, .leftToRight)
+                .help("דקות — לחץ ▶ כדי להתחיל")
+                HStack(spacing: 4) {
                     ForEach([1, 5, 10, 25], id: \.self) { m in
-                        Chip(title: "\(m) דק׳") { timer.start(minutes: Double(m)) }
+                        Chip(title: "\(m)", compact: true) { timer.start(minutes: Double(m)) }
                     }
                 }
+                .environment(\.layoutDirection, .leftToRight)
             }
         }
+    }
+}
+
+struct StepButton: View {
+    let symbol: String
+    var tint: Color = .white
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: symbol)
+                .font(.system(size: 10, weight: .bold))
+                .frame(width: 22, height: 22)
+                .background(tint.opacity(0.16), in: Circle())
+                .foregroundStyle(tint)
+                .contentShape(Circle())
+        }
+        .buttonStyle(PressStyle())
     }
 }
 
 struct Chip: View {
     let title: String
     var tint: Color = .orange
+    var compact = false
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: 12, weight: .semibold))
+                .font(.system(size: compact ? 11 : 12, weight: .semibold))
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 7)
+                .padding(.vertical, compact ? 5 : 7)
                 .background(tint.opacity(0.18), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
                 .foregroundStyle(tint)
                 .contentShape(Rectangle())

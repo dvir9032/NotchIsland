@@ -15,7 +15,9 @@
 		61BA458B894AADDCE46BC497 /* Shelf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65529F977D8D961C3031CD48 /* Shelf.swift */; };
 		672328425230DCFE1C54207A /* Mirror.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957B131A72AF57478AA6FE5 /* Mirror.swift */; };
 		93881D3153471462399DF9C6 /* Battery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C197E0F0C5EFD033D2647A3 /* Battery.swift */; };
+		9C16CAD617A56672701FF3C9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA8B071114DD66CBF0C3D84E /* Assets.xcassets */; };
 		9D6099109CEE6DD6A9193F11 /* IslandTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5D4FABA6D88E245D979CB8 /* IslandTimer.swift */; };
+		A7457A92B01221804AC797F7 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F712EADB0C5F6B711C404FA1 /* Settings.swift */; };
 		A7E47B73A68E22C671F79522 /* IslandView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFE68D383C94488BA45BEF6D /* IslandView.swift */; };
 		CE56484C0EF94ABD2E027379 /* IslandController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016B74E2AB0BE35D2E997D9A /* IslandController.swift */; };
 		FB08409187CE0AA1BC37037A /* NIHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 45078270344AEA49E45EBB9D /* NIHelper.m */; };
@@ -41,10 +43,12 @@
 		6B5D4FABA6D88E245D979CB8 /* IslandTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandTimer.swift; sourceTree = "<group>"; };
 		C1419F970EA6A2B622166C3D /* Bluetooth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bluetooth.swift; sourceTree = "<group>"; };
 		D6D6C8DA954DF3BCC5CFC007 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
+		DA8B071114DD66CBF0C3D84E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DFE68D383C94488BA45BEF6D /* IslandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandView.swift; sourceTree = "<group>"; };
 		E60E1F51C88C8499D70625F9 /* NIHelper.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = NIHelper.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		E957B131A72AF57478AA6FE5 /* Mirror.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mirror.swift; sourceTree = "<group>"; };
 		F69ED8B674B990874EB94E63 /* MediaController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaController.swift; sourceTree = "<group>"; };
+		F712EADB0C5F6B711C404FA1 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -78,6 +82,7 @@
 			isa = PBXGroup;
 			children = (
 				D6D6C8DA954DF3BCC5CFC007 /* App.swift */,
+				DA8B071114DD66CBF0C3D84E /* Assets.xcassets */,
 				4C197E0F0C5EFD033D2647A3 /* Battery.swift */,
 				C1419F970EA6A2B622166C3D /* Bluetooth.swift */,
 				016B74E2AB0BE35D2E997D9A /* IslandController.swift */,
@@ -86,6 +91,7 @@
 				DFE68D383C94488BA45BEF6D /* IslandView.swift */,
 				F69ED8B674B990874EB94E63 /* MediaController.swift */,
 				E957B131A72AF57478AA6FE5 /* Mirror.swift */,
+				F712EADB0C5F6B711C404FA1 /* Settings.swift */,
 				65529F977D8D961C3031CD48 /* Shelf.swift */,
 			);
 			path = NotchIsland;
@@ -174,6 +180,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9C16CAD617A56672701FF3C9 /* Assets.xcassets in Resources */,
 				49F16612662CE22BAD367186 /* NIHelper.dylib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -202,6 +209,7 @@
 				A7E47B73A68E22C671F79522 /* IslandView.swift in Sources */,
 				501DFAF927EBDBB28A7746C1 /* MediaController.swift in Sources */,
 				672328425230DCFE1C54207A /* Mirror.swift in Sources */,
+				A7457A92B01221804AC797F7 /* Settings.swift in Sources */,
 				61BA458B894AADDCE46BC497 /* Shelf.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
