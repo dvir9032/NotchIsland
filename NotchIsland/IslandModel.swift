@@ -4,10 +4,22 @@ import ServiceManagement
 
 final class IslandModel: ObservableObject {
     enum Activity: Equatable {
-        case music, timer, charging, lowBattery, timerDone
+        case music, timer, charging, lowBattery, timerDone, volume, brightness, bluetooth
     }
 
-    @Published var isOpen = false
+    @Published var isOpen = false {
+        didSet { if !isOpen { showMirror = false } }
+    }
+    @Published var showMirror = false {
+        didSet { showMirror ? mirror.start() : mirror.stop() }
+    }
+    @Published private(set) var hudLevel: Float = 0
+    @Published private(set) var hudMuted = false
+    @Published private(set) var btEvent: BluetoothMonitor.Event?
+    /// Slides the artwork after a swipe, as feedback.
+    @Published var nudge: CGFloat = 0
+    /// The media card's frame in the hosting view (SwiftUI global space), for swipe hit-testing.
+    var mediaFrame: CGRect = .zero
     @Published var dropTargeted = false
     @Published var draggingFiles = false
     @Published private(set) var flash: Activity?
@@ -17,6 +29,9 @@ final class IslandModel: ObservableObject {
     let battery = BatteryMonitor()
     let timer = IslandTimer()
     let shelf = Shelf()
+    let keys = MediaKeyTap()
+    let bluetooth = BluetoothMonitor()
+    let mirror = Mirror()
 
     private var bag = Set<AnyCancellable>()
     private var flashWork: DispatchWorkItem?
@@ -32,6 +47,41 @@ final class IslandModel: ObservableObject {
         }
         battery.$level.sink { [weak self] level in self?.checkLow(level) }.store(in: &bag)
         timer.onFinish = { [weak self] in self?.show(.timerDone, for: 8) }
+    }
+
+    func startServices() {
+        media.start()
+        keys.onChange = { [weak self] kind, level, muted in
+            self?.showHUD(kind == .volume ? .volume : .brightness, level: level, muted: muted)
+        }
+        let asked = UserDefaults.standard.bool(forKey: "askedAccessibility")
+        keys.start(prompt: !asked)
+        UserDefaults.standard.set(true, forKey: "askedAccessibility")
+        // Volume changed elsewhere (Control Center, another app) still shows the island's HUD.
+        var last = (SystemAudio.volume ?? 0, SystemAudio.isMuted)
+        SystemAudio.observe { [weak self] in
+            let now = (SystemAudio.volume ?? 0, SystemAudio.isMuted)
+            guard now != last else { return }
+            last = now
+            self?.showHUD(.volume, level: now.0, muted: now.1)
+        }
+        bluetooth.onEvent = { [weak self] e in
+            self?.btEvent = e
+            self?.show(.bluetooth, for: 3.5)
+        }
+        bluetooth.start()
+    }
+
+    private func showHUD(_ a: Activity, level: Float, muted: Bool) {
+        guard !isOpen else { return }
+        hudLevel = level
+        hudMuted = muted
+        show(a, for: 1.6)
+    }
+
+    func requestKeyAccess() {
+        keys.start(prompt: true)
+        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)
     }
 
     /// What the closed island shows beside the notch, most urgent first.
@@ -53,6 +103,8 @@ final class IslandModel: ObservableObject {
         case .music: return notch.height + 16
         case .timer, .timerDone: return 74
         case .charging, .lowBattery: return 64
+        case .volume, .brightness: return 104
+        case .bluetooth: return 84
         }
     }
 

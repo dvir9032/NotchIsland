@@ -7,15 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2BCC9071114AE36FE2980A46 /* Bluetooth.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1419F970EA6A2B622166C3D /* Bluetooth.swift */; };
 		49F16612662CE22BAD367186 /* NIHelper.dylib in Resources */ = {isa = PBXBuildFile; fileRef = E60E1F51C88C8499D70625F9 /* NIHelper.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		501DFAF927EBDBB28A7746C1 /* MediaController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F69ED8B674B990874EB94E63 /* MediaController.swift */; };
 		59BBA8CF4E0E76D9952C1C73 /* IslandModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC8DC3815868478810D97B0 /* IslandModel.swift */; };
 		6177638FE2BF50EA87F2BFBD /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6D6C8DA954DF3BCC5CFC007 /* App.swift */; };
 		61BA458B894AADDCE46BC497 /* Shelf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65529F977D8D961C3031CD48 /* Shelf.swift */; };
+		672328425230DCFE1C54207A /* Mirror.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957B131A72AF57478AA6FE5 /* Mirror.swift */; };
 		93881D3153471462399DF9C6 /* Battery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C197E0F0C5EFD033D2647A3 /* Battery.swift */; };
 		9D6099109CEE6DD6A9193F11 /* IslandTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5D4FABA6D88E245D979CB8 /* IslandTimer.swift */; };
 		A7E47B73A68E22C671F79522 /* IslandView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFE68D383C94488BA45BEF6D /* IslandView.swift */; };
 		CE56484C0EF94ABD2E027379 /* IslandController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016B74E2AB0BE35D2E997D9A /* IslandController.swift */; };
+		CE80749442671AB8C5AEA55D /* SystemControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224BCB73F87718D3310ED6C /* SystemControls.swift */; };
 		FB08409187CE0AA1BC37037A /* NIHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 45078270344AEA49E45EBB9D /* NIHelper.m */; };
 /* End PBXBuildFile section */
 
@@ -32,14 +35,17 @@
 /* Begin PBXFileReference section */
 		016B74E2AB0BE35D2E997D9A /* IslandController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandController.swift; sourceTree = "<group>"; };
 		3FC8DC3815868478810D97B0 /* IslandModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandModel.swift; sourceTree = "<group>"; };
+		4224BCB73F87718D3310ED6C /* SystemControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemControls.swift; sourceTree = "<group>"; };
 		45078270344AEA49E45EBB9D /* NIHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NIHelper.m; sourceTree = "<group>"; };
 		4C197E0F0C5EFD033D2647A3 /* Battery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Battery.swift; sourceTree = "<group>"; };
 		5D875A49913E51457FDDC1F5 /* NotchIsland.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NotchIsland.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		65529F977D8D961C3031CD48 /* Shelf.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shelf.swift; sourceTree = "<group>"; };
 		6B5D4FABA6D88E245D979CB8 /* IslandTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandTimer.swift; sourceTree = "<group>"; };
+		C1419F970EA6A2B622166C3D /* Bluetooth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bluetooth.swift; sourceTree = "<group>"; };
 		D6D6C8DA954DF3BCC5CFC007 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		DFE68D383C94488BA45BEF6D /* IslandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandView.swift; sourceTree = "<group>"; };
 		E60E1F51C88C8499D70625F9 /* NIHelper.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = NIHelper.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		E957B131A72AF57478AA6FE5 /* Mirror.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mirror.swift; sourceTree = "<group>"; };
 		F69ED8B674B990874EB94E63 /* MediaController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -75,12 +81,15 @@
 			children = (
 				D6D6C8DA954DF3BCC5CFC007 /* App.swift */,
 				4C197E0F0C5EFD033D2647A3 /* Battery.swift */,
+				C1419F970EA6A2B622166C3D /* Bluetooth.swift */,
 				016B74E2AB0BE35D2E997D9A /* IslandController.swift */,
 				3FC8DC3815868478810D97B0 /* IslandModel.swift */,
 				6B5D4FABA6D88E245D979CB8 /* IslandTimer.swift */,
 				DFE68D383C94488BA45BEF6D /* IslandView.swift */,
 				F69ED8B674B990874EB94E63 /* MediaController.swift */,
+				E957B131A72AF57478AA6FE5 /* Mirror.swift */,
 				65529F977D8D961C3031CD48 /* Shelf.swift */,
+				4224BCB73F87718D3310ED6C /* SystemControls.swift */,
 			);
 			path = NotchIsland;
 			sourceTree = "<group>";
@@ -189,12 +198,15 @@
 			files = (
 				6177638FE2BF50EA87F2BFBD /* App.swift in Sources */,
 				93881D3153471462399DF9C6 /* Battery.swift in Sources */,
+				2BCC9071114AE36FE2980A46 /* Bluetooth.swift in Sources */,
 				CE56484C0EF94ABD2E027379 /* IslandController.swift in Sources */,
 				59BBA8CF4E0E76D9952C1C73 /* IslandModel.swift in Sources */,
 				9D6099109CEE6DD6A9193F11 /* IslandTimer.swift in Sources */,
 				A7E47B73A68E22C671F79522 /* IslandView.swift in Sources */,
 				501DFAF927EBDBB28A7746C1 /* MediaController.swift in Sources */,
+				672328425230DCFE1C54207A /* Mirror.swift in Sources */,
 				61BA458B894AADDCE46BC497 /* Shelf.swift in Sources */,
+				CE80749442671AB8C5AEA55D /* SystemControls.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -240,6 +252,8 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "אי דינמי";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "האי מראה כשאוזניות ומכשירי בלוטות' מתחברים, ואת הסוללה שלהם.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "המראה בנוצ' מציגה את המצלמה הקדמית רק כשאתה פותח אותה.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -407,6 +421,8 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "אי דינמי";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "האי מראה כשאוזניות ומכשירי בלוטות' מתחברים, ואת הסוללה שלהם.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "המראה בנוצ' מציגה את המצלמה הקדמית רק כשאתה פותח אותה.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",

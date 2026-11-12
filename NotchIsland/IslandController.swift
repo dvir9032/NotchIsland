@@ -25,6 +25,10 @@ final class IslandController {
     private var pinnedOpen = false
     private var dragPoll: Timer?
     private var dragStartCount = 0
+    private var swipe = CGVector.zero
+    private var swipeFired = false
+    /// After a swipe-up closes the island, don't reopen it until the pointer leaves.
+    private var holdClosed = false
 
     private static let canvas = CGSize(width: 780, height: 240)
 
@@ -35,11 +39,11 @@ final class IslandController {
         panel.isOpaque = false
         panel.backgroundColor = .clear
         panel.hasShadow = false
+        panel.isFloatingPanel = true  // before `level`: it resets the level to .floating
         panel.level = NSWindow.Level(rawValue: NSWindow.Level.mainMenu.rawValue + 3)
         panel.collectionBehavior = [.canJoinAllSpaces, .stationary, .fullScreenAuxiliary, .ignoresCycle]
         panel.isMovable = false
         panel.hidesOnDeactivate = false
-        panel.isFloatingPanel = true
         panel.becomesKeyOnlyIfNeeded = true
         panel.acceptsMouseMovedEvents = true
         panel.ignoresMouseEvents = true
@@ -54,6 +58,9 @@ final class IslandController {
         }
         if let l = NSEvent.addLocalMonitorForEvents(matching: events, handler: { [weak self] e in self?.track(); return e }) {
             monitors.append(l)
+        }
+        if let s = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel, handler: { [weak self] e in self?.scrolled(e) ?? e }) {
+            monitors.append(s)
         }
         // File drags from Finder don't reliably reach event monitors, so watch the drag pasteboard
         // from mouse-down until release.
@@ -97,6 +104,56 @@ final class IslandController {
         let s = model.size
         let f = screen.frame
         return NSRect(x: f.midX - s.width / 2, y: f.maxY - s.height, width: s.width, height: s.height)
+    }
+
+    // MARK: Trackpad gestures
+
+    /// Two-finger swipes over the open island: sideways on the player skips tracks, up closes.
+    private func scrolled(_ e: NSEvent) -> NSEvent? {
+        guard model.isOpen, e.hasPreciseScrollingDeltas else { return e }
+        switch e.phase {
+        case .began:
+            swipe = .zero
+            swipeFired = false
+        case .changed:
+            break
+        default:
+            return e
+        }
+        // Normalise to finger movement whatever the natural-scrolling setting is.
+        let sign: CGFloat = e.isDirectionInvertedFromDevice ? 1 : -1
+        swipe.dx += e.scrollingDeltaX * sign
+        swipe.dy += e.scrollingDeltaY * sign
+        guard !swipeFired else { return nil }
+
+        let horizontal = abs(swipe.dx) > 55 && abs(swipe.dx) > abs(swipe.dy) * 1.5
+        let up = swipe.dy < -45 && abs(swipe.dy) > abs(swipe.dx) * 1.5
+        if horizontal, model.media.track != nil, overMediaCard(e) {
+            swipeFired = true
+            let toNext = swipe.dx < 0  // fingers to the left, like flicking a card away
+            toNext ? model.media.next() : model.media.previous()
+            NSHapticFeedbackManager.defaultPerformer.perform(.alignment, performanceTime: .now)
+            withAnimation(.easeOut(duration: 0.12)) { model.nudge = toNext ? -18 : 18 }
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.6).delay(0.12)) { model.nudge = 0 }
+            return nil
+        }
+        if up {
+            swipeFired = true
+            holdClosed = true
+            closeWork?.cancel()
+            closeWork = nil
+            model.isOpen = false
+            panel.ignoresMouseEvents = true
+            return nil
+        }
+        return e
+    }
+
+    private func overMediaCard(_ e: NSEvent) -> Bool {
+        guard let view = panel.contentView else { return false }
+        let p = view.convert(e.locationInWindow, from: nil)
+        let flipped = CGPoint(x: p.x, y: view.isFlipped ? p.y : view.bounds.height - p.y)
+        return model.mediaFrame.insetBy(dx: -10, dy: -10).contains(flipped)
     }
 
     // MARK: File drags
@@ -147,6 +204,10 @@ final class IslandController {
         let p = NSEvent.mouseLocation
         let inside = hoverZone().contains(p)
         panel.ignoresMouseEvents = !inside
+        if holdClosed {
+            if inside { return }
+            holdClosed = false
+        }
 
         if inside {
             closeWork?.cancel()

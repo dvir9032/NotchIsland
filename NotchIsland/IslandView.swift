@@ -55,6 +55,9 @@ struct IslandView: View {
         .onTapGesture { if !model.isOpen { model.isOpen = true } }
         .contextMenu {
             Button(model.launchesAtLogin ? "✓ הפעלה עם ההתחברות" : "הפעלה עם ההתחברות") { model.toggleLaunchAtLogin() }
+            if !model.keys.isActive {
+                Button("הפעל ווליום ובהירות בנוצ'…") { model.requestKeyAccess() }
+            }
             Divider()
             Button("יציאה מהאי הדינמי") { NSApp.terminate(nil) }
         }
@@ -100,7 +103,25 @@ struct CompactView: View {
             Image(systemName: "bolt.fill").foregroundStyle(.green).font(.system(size: 14, weight: .bold))
         case .lowBattery:
             Image(systemName: "battery.25percent").foregroundStyle(.red).font(.system(size: 15))
+        case .volume:
+            Image(systemName: model.hudMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(model.hudLevel))
+                .font(.system(size: 13, weight: .semibold))
+                .contentTransition(.symbolEffect(.replace))
+        case .brightness:
+            Image(systemName: model.hudLevel < 0.5 ? "sun.min.fill" : "sun.max.fill")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(.yellow)
+        case .bluetooth:
+            if let e = model.btEvent {
+                Image(systemName: Self.validSymbol(e.symbol))
+                    .font(.system(size: 15))
+                    .foregroundStyle(e.connected ? .white : .white.opacity(0.45))
+            }
         }
+    }
+
+    private static func validSymbol(_ name: String) -> String {
+        NSImage(systemSymbolName: name, accessibilityDescription: nil) != nil ? name : "headphones"
     }
 
     @ViewBuilder private var trailing: some View {
@@ -120,7 +141,41 @@ struct CompactView: View {
             Text("\(model.battery.level)%").font(.system(size: 13, weight: .semibold).monospacedDigit()).foregroundStyle(.green)
         case .lowBattery:
             Text("\(model.battery.level)%").font(.system(size: 13, weight: .semibold).monospacedDigit()).foregroundStyle(.red)
+        case .volume:
+            LevelBar(level: model.hudMuted ? 0 : model.hudLevel, color: .white)
+        case .brightness:
+            LevelBar(level: model.hudLevel, color: .yellow)
+        case .bluetooth:
+            if let e = model.btEvent {
+                Group {
+                    if !e.connected {
+                        Text("נותק").foregroundStyle(.white.opacity(0.5))
+                    } else if let b = e.battery {
+                        Text("\(b)%").foregroundStyle(b <= 20 ? .red : .green)
+                    } else {
+                        Text("מחובר").foregroundStyle(.white.opacity(0.8))
+                    }
+                }
+                .font(.system(size: 12, weight: .semibold).monospacedDigit())
+                .help(e.name)
+            }
         }
+    }
+}
+
+struct LevelBar: View {
+    let level: Float
+    let color: Color
+
+    var body: some View {
+        ZStack(alignment: .leading) {
+            Capsule().fill(Color.white.opacity(0.18))
+            GeometryReader { g in
+                Capsule().fill(color).frame(width: g.size.width * CGFloat(min(1, max(0, level))))
+            }
+        }
+        .frame(width: 72, height: 5)
+        .animation(.spring(response: 0.25, dampingFraction: 0.85), value: level)
     }
 }
 
@@ -173,10 +228,18 @@ struct ExpandedView: View {
             HeaderRow(model: model)
                 .frame(height: model.notch.height)
             if model.draggingFiles {
-                DropZone(targeted: model.dropTargeted, count: model.shelf.items.count)
+                HStack(spacing: 12) {
+                    DropZone(targeted: model.dropTargeted, count: model.shelf.items.count)
+                    AirDropZone(shelf: model.shelf)
+                        .frame(width: 170)
+                }
+                .padding(.top, 10)
+                .padding(.bottom, 18)
+                .padding(.horizontal, 22)
+            } else if model.showMirror {
+                MirrorCard(model: model)
                     .padding(.top, 10)
                     .padding(.bottom, 18)
-                    .padding(.horizontal, 22)
             } else {
                 cards
             }
@@ -189,8 +252,9 @@ struct ExpandedView: View {
 
     private var cards: some View {
             HStack(alignment: .top, spacing: 16) {
-                MediaCard(media: model.media)
+                MediaCard(media: model.media, nudge: model.nudge)
                     .frame(width: 300)
+                    .onGeometryChange(for: CGRect.self, of: { $0.frame(in: .global) }) { model.mediaFrame = $0 }
                 Divider().overlay(Color.white.opacity(0.08))
                 TimerCard(timer: model.timer)
                     .frame(width: 118)
@@ -200,6 +264,64 @@ struct ExpandedView: View {
             .padding(.top, 12)
             .padding(.bottom, 18)
             .padding(.horizontal, 22)
+    }
+}
+
+struct AirDropZone: View {
+    @ObservedObject var shelf: Shelf
+    @State private var targeted = false
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: 18, style: .continuous)
+            .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [7, 5]))
+            .foregroundStyle(targeted ? Color.blue : .white.opacity(0.3))
+            .background(Color.blue.opacity(targeted ? 0.25 : 0.06), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .overlay {
+                VStack(spacing: 6) {
+                    Image(systemName: "dot.radiowaves.up.forward")
+                        .font(.system(size: 28))
+                        .symbolEffect(.bounce, value: targeted)
+                    Text("AirDrop").font(.system(size: 14, weight: .semibold))
+                }
+                .foregroundStyle(targeted ? .white : .white.opacity(0.7))
+            }
+            .scaleEffect(targeted ? 1.03 : 1)
+            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: targeted)
+            .onDrop(of: [.fileURL], isTargeted: $targeted) { shelf.handleAirDropDrop($0) }
+    }
+}
+
+struct MirrorCard: View {
+    @ObservedObject var model: IslandModel
+    @ObservedObject var mirror: Mirror
+
+    init(model: IslandModel) {
+        self.model = model
+        self.mirror = model.mirror
+    }
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            if mirror.denied {
+                VStack(spacing: 6) {
+                    Image(systemName: "video.slash").font(.system(size: 24))
+                    Text("אין הרשאה למצלמה").font(.system(size: 13, weight: .semibold))
+                    Button("פתח הגדרות") {
+                        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera")!)
+                    }
+                    .buttonStyle(.plain)
+                    .font(.system(size: 12))
+                    .foregroundStyle(.blue)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .foregroundStyle(.white.opacity(0.7))
+            } else {
+                MirrorPreview(session: mirror.session)
+                    .frame(width: 206, height: 116)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .frame(maxWidth: .infinity)
+            }
+        }
     }
 }
 
@@ -240,6 +362,18 @@ struct HeaderRow: View {
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(.white.opacity(0.75))
             }
+            Button {
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) { model.showMirror.toggle() }
+            } label: {
+                Image(systemName: model.showMirror ? "xmark.circle.fill" : "web.camera")
+                    .font(.system(size: 13))
+                    .foregroundStyle(.white.opacity(model.showMirror ? 0.9 : 0.6))
+                    .frame(width: 26, height: 22)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(PressStyle())
+            .help(model.showMirror ? "סגור מראה" : "מראה")
+            .padding(.leading, 6)
             Spacer(minLength: model.notch.width + 24)
             if model.battery.hasBattery {
                 BatteryBadge(battery: model.battery)
@@ -281,11 +415,13 @@ struct BatteryBadge: View {
 
 struct MediaCard: View {
     @ObservedObject var media: MediaController
+    var nudge: CGFloat = 0
 
     var body: some View {
         if let track = media.track {
             HStack(spacing: 14) {
                 ArtworkView(media: media, size: 84, radius: 14)
+                    .offset(x: -nudge)
                     .overlay(alignment: .bottomLeading) {
                         if media.artwork != nil, let icon = media.appIcon {
                             Image(nsImage: icon).resizable().frame(width: 24, height: 24).offset(x: -6, y: 6)
@@ -462,6 +598,14 @@ struct ShelfCard: View {
                 Text("מדף").font(.system(size: 11, weight: .semibold)).foregroundStyle(.white.opacity(0.5))
                 Spacer()
                 if !shelf.items.isEmpty {
+                    Button {
+                        shelf.airDrop(shelf.items)
+                    } label: {
+                        Image(systemName: "dot.radiowaves.up.forward").font(.system(size: 11))
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.blue)
+                    .help("שלח הכול ב-AirDrop")
                     Button("נקה") { shelf.clear() }
                         .buttonStyle(.plain)
                         .font(.system(size: 11))
@@ -517,6 +661,7 @@ struct ShelfItem: View {
         .onTapGesture(count: 2) { NSWorkspace.shared.open(url) }
         .contextMenu {
             Button("פתח") { NSWorkspace.shared.open(url) }
+            Button("שלח ב-AirDrop") { shelf.airDrop([url]) }
             Button("הצג ב-Finder") { NSWorkspace.shared.activateFileViewerSelecting([url]) }
             Divider()
             Button("הסר מהמדף") { shelf.remove(url) }

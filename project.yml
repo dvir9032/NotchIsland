@@ -39,3 +39,5 @@ targets:
         INFOPLIST_KEY_CFBundleDisplayName: אי דינמי
         INFOPLIST_KEY_LSUIElement: YES
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
+        INFOPLIST_KEY_NSCameraUsageDescription: המראה בנוצ' מציגה את המצלמה הקדמית רק כשאתה פותח אותה.
+        INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription: האי מראה כשאוזניות ומכשירי בלוטות' מתחברים, ואת הסוללה שלהם.

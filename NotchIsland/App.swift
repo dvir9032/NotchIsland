@@ -15,7 +15,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let c = IslandController()
-        c.model.media.start()
+        c.model.startServices()
         controller = c
         // `NotchIsland -launchAtLogin YES` turns the login item on from the command line.
         if UserDefaults.standard.bool(forKey: "launchAtLogin"), !c.model.launchesAtLogin {
@@ -25,5 +25,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         controller?.model.media.stop()
+        controller?.model.mirror.stop()
     }
 }

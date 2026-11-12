@@ -28,14 +28,38 @@ final class Shelf: ObservableObject {
     }
 
     func handleDrop(_ providers: [NSItemProvider]) -> Bool {
+        Self.loadURLs(providers) { [weak self] urls in self?.add(urls) }
+    }
+
+    /// Dropped straight onto the AirDrop target: send without parking on the shelf.
+    func handleAirDropDrop(_ providers: [NSItemProvider]) -> Bool {
+        Self.loadURLs(providers) { [weak self] urls in self?.airDrop(urls) }
+    }
+
+    func airDrop(_ urls: [URL]) {
+        guard !urls.isEmpty, let service = NSSharingService(named: .sendViaAirDrop), service.canPerform(withItems: urls) else {
+            NSSound.beep()
+            return
+        }
+        // The AirDrop picker only comes forward for an active app.
+        NSApp.activate()
+        service.perform(withItems: urls)
+    }
+
+    private static func loadURLs(_ providers: [NSItemProvider], then done: @escaping ([URL]) -> Void) -> Bool {
         let fileProviders = providers.filter { $0.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) }
         guard !fileProviders.isEmpty else { return false }
+        let group = DispatchGroup()
+        var urls: [URL] = []
+        let lock = NSLock()
         for p in fileProviders {
-            _ = p.loadObject(ofClass: URL.self) { [weak self] url, _ in
-                guard let url else { return }
-                DispatchQueue.main.async { self?.add([url]) }
+            group.enter()
+            _ = p.loadObject(ofClass: URL.self) { url, _ in
+                if let url { lock.lock(); urls.append(url); lock.unlock() }
+                group.leave()
             }
         }
+        group.notify(queue: .main) { done(urls) }
         return true
     }
 
