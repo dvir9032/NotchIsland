@@ -17,6 +17,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let c = IslandController()
         c.model.media.start()
         controller = c
+        // `NotchIsland -launchAtLogin YES` turns the login item on from the command line.
+        if UserDefaults.standard.bool(forKey: "launchAtLogin"), !c.model.launchesAtLogin {
+            c.model.toggleLaunchAtLogin()
+        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {
