@@ -1,0 +1,376 @@
+{
+  "sourceLanguage": "en",
+  "version": "1.0",
+  "strings": {
+    "AirDrop everything": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שלח הכול ב-AirDrop"
+          }
+        }
+      }
+    },
+    "Already on the shelf: %lld": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כבר במדף: %lld"
+          }
+        }
+      }
+    },
+    "Bluetooth devices connecting": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "חיבור מכשירי בלוטות'"
+          }
+        }
+      }
+    },
+    "Charging and low battery": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "טעינה וסוללה חלשה"
+          }
+        }
+      }
+    },
+    "Clear": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נקה"
+          }
+        }
+      }
+    },
+    "Close mirror": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סגור מראה"
+          }
+        }
+      }
+    },
+    "Connected": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מחובר"
+          }
+        }
+      }
+    },
+    "Disconnected": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נותק"
+          }
+        }
+      }
+    },
+    "Drop files here": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "גרור לכאן קבצים"
+          }
+        }
+      }
+    },
+    "Drop here to keep on the shelf": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "גרור לכאן כדי לשמור במדף"
+          }
+        }
+      }
+    },
+    "Fast": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מהירה"
+          }
+        }
+      }
+    },
+    "Hover speed": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מהירות פתיחה במעבר עכבר"
+          }
+        }
+      }
+    },
+    "Launch at login": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הפעלה עם ההתחברות"
+          }
+        }
+      }
+    },
+    "Minutes — press ▶ to start": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "דקות — לחץ ▶ כדי להתחיל"
+          }
+        }
+      }
+    },
+    "Mirror": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מראה"
+          }
+        }
+      }
+    },
+    "Mirror button": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כפתור מראה"
+          }
+        }
+      }
+    },
+    "Music playing": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מוזיקה שמתנגנת"
+          }
+        }
+      }
+    },
+    "No camera access": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אין הרשאה למצלמה"
+          }
+        }
+      }
+    },
+    "Normal": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "רגילה"
+          }
+        }
+      }
+    },
+    "Notch Island Settings": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הגדרות האי הדינמי"
+          }
+        }
+      }
+    },
+    "Nothing playing": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שום דבר לא מתנגן"
+          }
+        }
+      }
+    },
+    "Open": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "פתח"
+          }
+        }
+      }
+    },
+    "Open Settings": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "פתח הגדרות"
+          }
+        }
+      }
+    },
+    "Opening": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "פתיחה"
+          }
+        }
+      }
+    },
+    "Quit Notch Island": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "יציאה מהאי הדינמי"
+          }
+        }
+      }
+    },
+    "Release to add to the shelf": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שחרר כדי לשים במדף"
+          }
+        }
+      }
+    },
+    "Remove from shelf": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הסר מהמדף"
+          }
+        }
+      }
+    },
+    "Running timer": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "טיימר פעיל"
+          }
+        }
+      }
+    },
+    "Send with AirDrop": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שלח ב-AirDrop"
+          }
+        }
+      }
+    },
+    "Settings…": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הגדרות…"
+          }
+        }
+      }
+    },
+    "Shelf": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מדף"
+          }
+        }
+      }
+    },
+    "Show beside the notch": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מה מופיע ליד הנוצ'"
+          }
+        }
+      }
+    },
+    "Show in Finder": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הצג ב-Finder"
+          }
+        }
+      }
+    },
+    "Slow": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "איטית"
+          }
+        }
+      }
+    },
+    "Stop": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עצור"
+          }
+        }
+      }
+    },
+    "Time's up": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הזמן נגמר"
+          }
+        }
+      }
+    },
+    "Timer": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "טיימר"
+          }
+        }
+      }
+    }
+  }
+}

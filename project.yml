@@ -1,6 +1,7 @@
 name: NotchIsland
 options:
   bundleIdPrefix: com.dvir
+  developmentLanguage: en
   deploymentTarget:
     macOS: "15.0"
 settings:
@@ -37,8 +38,8 @@ targets:
         CURRENT_PROJECT_VERSION: "1"
         ENABLE_HARDENED_RUNTIME: NO
         GENERATE_INFOPLIST_FILE: YES
-        INFOPLIST_KEY_CFBundleDisplayName: אי דינמי
+        INFOPLIST_KEY_CFBundleDisplayName: Notch Island
         INFOPLIST_KEY_LSUIElement: YES
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
-        INFOPLIST_KEY_NSCameraUsageDescription: המראה בנוצ' מציגה את המצלמה הקדמית רק כשאתה פותח אותה.
-        INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription: האי מראה כשאוזניות ומכשירי בלוטות' מתחברים, ואת הסוללה שלהם.
+        INFOPLIST_KEY_NSCameraUsageDescription: The mirror in the notch shows the front camera only while you have it open.
+        INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription: Notch Island shows when headphones and other Bluetooth devices connect, with their battery level.

@@ -11,12 +11,14 @@
 		49F16612662CE22BAD367186 /* NIHelper.dylib in Resources */ = {isa = PBXBuildFile; fileRef = E60E1F51C88C8499D70625F9 /* NIHelper.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		501DFAF927EBDBB28A7746C1 /* MediaController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F69ED8B674B990874EB94E63 /* MediaController.swift */; };
 		59BBA8CF4E0E76D9952C1C73 /* IslandModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC8DC3815868478810D97B0 /* IslandModel.swift */; };
+		5F547DA20D3669A575315FCE /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 6581F98A43E30FDAFE441698 /* InfoPlist.xcstrings */; };
 		6177638FE2BF50EA87F2BFBD /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6D6C8DA954DF3BCC5CFC007 /* App.swift */; };
 		61BA458B894AADDCE46BC497 /* Shelf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65529F977D8D961C3031CD48 /* Shelf.swift */; };
 		672328425230DCFE1C54207A /* Mirror.swift in Sources */ = {isa = PBXBuildFile; fileRef = E957B131A72AF57478AA6FE5 /* Mirror.swift */; };
 		93881D3153471462399DF9C6 /* Battery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C197E0F0C5EFD033D2647A3 /* Battery.swift */; };
 		9C16CAD617A56672701FF3C9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA8B071114DD66CBF0C3D84E /* Assets.xcassets */; };
 		9D6099109CEE6DD6A9193F11 /* IslandTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5D4FABA6D88E245D979CB8 /* IslandTimer.swift */; };
+		A61D3E34DF5BCCF94D6B42F6 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 6B2DF1E331583B63DEF6B302 /* Localizable.xcstrings */; };
 		A7457A92B01221804AC797F7 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F712EADB0C5F6B711C404FA1 /* Settings.swift */; };
 		A7E47B73A68E22C671F79522 /* IslandView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFE68D383C94488BA45BEF6D /* IslandView.swift */; };
 		CE56484C0EF94ABD2E027379 /* IslandController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016B74E2AB0BE35D2E997D9A /* IslandController.swift */; };
@@ -40,6 +42,8 @@
 		4C197E0F0C5EFD033D2647A3 /* Battery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Battery.swift; sourceTree = "<group>"; };
 		5D875A49913E51457FDDC1F5 /* NotchIsland.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NotchIsland.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		65529F977D8D961C3031CD48 /* Shelf.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shelf.swift; sourceTree = "<group>"; };
+		6581F98A43E30FDAFE441698 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
+		6B2DF1E331583B63DEF6B302 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		6B5D4FABA6D88E245D979CB8 /* IslandTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandTimer.swift; sourceTree = "<group>"; };
 		C1419F970EA6A2B622166C3D /* Bluetooth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bluetooth.swift; sourceTree = "<group>"; };
 		D6D6C8DA954DF3BCC5CFC007 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
@@ -85,10 +89,12 @@
 				DA8B071114DD66CBF0C3D84E /* Assets.xcassets */,
 				4C197E0F0C5EFD033D2647A3 /* Battery.swift */,
 				C1419F970EA6A2B622166C3D /* Bluetooth.swift */,
+				6581F98A43E30FDAFE441698 /* InfoPlist.xcstrings */,
 				016B74E2AB0BE35D2E997D9A /* IslandController.swift */,
 				3FC8DC3815868478810D97B0 /* IslandModel.swift */,
 				6B5D4FABA6D88E245D979CB8 /* IslandTimer.swift */,
 				DFE68D383C94488BA45BEF6D /* IslandView.swift */,
+				6B2DF1E331583B63DEF6B302 /* Localizable.xcstrings */,
 				F69ED8B674B990874EB94E63 /* MediaController.swift */,
 				E957B131A72AF57478AA6FE5 /* Mirror.swift */,
 				F712EADB0C5F6B711C404FA1 /* Settings.swift */,
@@ -161,6 +167,7 @@
 			knownRegions = (
 				Base,
 				en,
+				he,
 			);
 			mainGroup = 2FE0F1B602CBAF2BB360B5A8;
 			minimizedProjectReferenceProxies = 1;
@@ -181,6 +188,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				9C16CAD617A56672701FF3C9 /* Assets.xcassets in Resources */,
+				5F547DA20D3669A575315FCE /* InfoPlist.xcstrings in Resources */,
+				A61D3E34DF5BCCF94D6B42F6 /* Localizable.xcstrings in Resources */,
 				49F16612662CE22BAD367186 /* NIHelper.dylib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -253,11 +262,11 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "אי דינמי";
+				INFOPLIST_KEY_CFBundleDisplayName = "Notch Island";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "האי מראה כשאוזניות ומכשירי בלוטות' מתחברים, ואת הסוללה שלהם.";
-				INFOPLIST_KEY_NSCameraUsageDescription = "המראה בנוצ' מציגה את המצלמה הקדמית רק כשאתה פותח אותה.";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Notch Island shows when headphones and other Bluetooth devices connect, with their battery level.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "The mirror in the notch shows the front camera only while you have it open.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -422,11 +431,11 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "אי דינמי";
+				INFOPLIST_KEY_CFBundleDisplayName = "Notch Island";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "האי מראה כשאוזניות ומכשירי בלוטות' מתחברים, ואת הסוללה שלהם.";
-				INFOPLIST_KEY_NSCameraUsageDescription = "המראה בנוצ' מציגה את המצלמה הקדמית רק כשאתה פותח אותה.";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Notch Island shows when headphones and other Bluetooth devices connect, with their battery level.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "The mirror in the notch shows the front camera only while you have it open.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",

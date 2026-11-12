@@ -24,28 +24,27 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            Section("מה מופיע ליד הנוצ'") {
-                Toggle("מוזיקה שמתנגנת", isOn: $showMusic)
-                Toggle("טיימר פעיל", isOn: $showTimer)
-                Toggle("טעינה וסוללה חלשה", isOn: $showBattery)
-                Toggle("חיבור מכשירי בלוטות'", isOn: $showBluetooth)
+            Section("Show beside the notch") {
+                Toggle("Music playing", isOn: $showMusic)
+                Toggle("Running timer", isOn: $showTimer)
+                Toggle("Charging and low battery", isOn: $showBattery)
+                Toggle("Bluetooth devices connecting", isOn: $showBluetooth)
             }
-            Section("פתיחה") {
-                Picker("מהירות פתיחה במעבר עכבר", selection: $hoverDelay) {
-                    Text("מהירה").tag(0.1)
-                    Text("רגילה").tag(0.2)
-                    Text("איטית").tag(0.45)
+            Section("Opening") {
+                Picker("Hover speed", selection: $hoverDelay) {
+                    Text("Fast").tag(0.1)
+                    Text("Normal").tag(0.2)
+                    Text("Slow").tag(0.45)
                 }
-                Toggle("כפתור מראה", isOn: $showMirrorButton)
+                Toggle("Mirror button", isOn: $showMirrorButton)
             }
             Section {
-                Toggle("הפעלה עם ההתחברות", isOn: Binding(get: { model.launchesAtLogin }, set: { _ in model.toggleLaunchAtLogin() }))
+                Toggle("Launch at login", isOn: Binding(get: { model.launchesAtLogin }, set: { _ in model.toggleLaunchAtLogin() }))
             }
         }
         .formStyle(.grouped)
         .frame(width: 380)
         .fixedSize()
-        .environment(\.layoutDirection, .rightToLeft)
     }
 }
 
@@ -55,7 +54,7 @@ final class SettingsWindow {
     func show(model: IslandModel) {
         if window == nil {
             let w = NSWindow(contentViewController: NSHostingController(rootView: SettingsView(model: model)))
-            w.title = "הגדרות האי הדינמי"
+            w.title = String(localized: "Notch Island Settings")
             w.styleMask = [.titled, .closable]
             w.isReleasedWhenClosed = false
             w.center()

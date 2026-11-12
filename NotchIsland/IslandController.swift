@@ -149,11 +149,13 @@ final class IslandController {
         return e
     }
 
-    /// The player is the right-hand column of the open island (the layout is right-to-left);
-    /// the shelf on the left keeps its own horizontal scrolling.
+    /// The player is the leading column of the open island (right in Hebrew, left in English);
+    /// the shelf at the other end keeps its own horizontal scrolling.
     private func overPlayer() -> Bool {
         let r = islandRect()
-        return NSEvent.mouseLocation.x > r.maxX - model.topRadius - 360
+        let x = NSEvent.mouseLocation.x
+        let width = model.topRadius + 360
+        return NSApp.userInterfaceLayoutDirection == .rightToLeft ? x > r.maxX - width : x < r.minX + width
     }
 
     // MARK: File drags

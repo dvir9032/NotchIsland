@@ -56,10 +56,10 @@ struct IslandView: View {
         .contentShape(shape)
         .onTapGesture { if !model.isOpen { model.isOpen = true } }
         .contextMenu {
-            Button("הגדרות…") { model.openSettings() }
-            Button(model.launchesAtLogin ? "✓ הפעלה עם ההתחברות" : "הפעלה עם ההתחברות") { model.toggleLaunchAtLogin() }
+            Button("Settings…") { model.openSettings() }
+            Toggle("Launch at login", isOn: Binding(get: { model.launchesAtLogin }, set: { _ in model.toggleLaunchAtLogin() }))
             Divider()
-            Button("יציאה מהאי הדינמי") { NSApp.terminate(nil) }
+            Button("Quit Notch Island") { NSApp.terminate(nil) }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         // The whole canvas takes drops, so near-misses around the island still land on the shelf.
@@ -128,7 +128,7 @@ struct CompactView: View {
                     .foregroundStyle(.orange)
             }
         case .timerDone:
-            Text("הזמן נגמר").font(.system(size: 12, weight: .semibold)).foregroundStyle(.orange)
+            Text("Time's up").font(.system(size: 12, weight: .semibold)).foregroundStyle(.orange)
         case .charging:
             Text("\(model.battery.level)%").font(.system(size: 13, weight: .semibold).monospacedDigit()).foregroundStyle(.green)
         case .lowBattery:
@@ -137,11 +137,11 @@ struct CompactView: View {
             if let e = model.btEvent {
                 Group {
                     if !e.connected {
-                        Text("נותק").foregroundStyle(.white.opacity(0.5))
+                        Text("Disconnected").foregroundStyle(.white.opacity(0.5))
                     } else if let b = e.battery {
                         Text("\(b)%").foregroundStyle(b <= 20 ? .red : .green)
                     } else {
-                        Text("מחובר").foregroundStyle(.white.opacity(0.8))
+                        Text("Connected").foregroundStyle(.white.opacity(0.8))
                     }
                 }
                 .font(.system(size: 12, weight: .semibold).monospacedDigit())
@@ -271,7 +271,6 @@ struct ExpandedView: View {
         }
         .padding(.horizontal, model.topRadius)
         .foregroundStyle(.white)
-        .environment(\.layoutDirection, .rightToLeft)
         .animation(.easeOut(duration: 0.18), value: model.draggingFiles)
     }
 
@@ -329,8 +328,8 @@ struct MirrorCard: View {
             if mirror.denied {
                 VStack(spacing: 6) {
                     Image(systemName: "video.slash").font(.system(size: 24))
-                    Text("אין הרשאה למצלמה").font(.system(size: 13, weight: .semibold))
-                    Button("פתח הגדרות") {
+                    Text("No camera access").font(.system(size: 13, weight: .semibold))
+                    Button("Open Settings") {
                         NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera")!)
                     }
                     .buttonStyle(.plain)
@@ -362,10 +361,10 @@ struct DropZone: View {
                     Image(systemName: "tray.and.arrow.down.fill")
                         .font(.system(size: 30))
                         .symbolEffect(.bounce, value: targeted)
-                    Text(targeted ? "שחרר כדי לשים במדף" : "גרור לכאן כדי לשמור במדף")
+                    (targeted ? Text("Release to add to the shelf") : Text("Drop here to keep on the shelf"))
                         .font(.system(size: 14, weight: .semibold))
                     if count > 0 {
-                        Text("כבר במדף: \(count)").font(.system(size: 11)).foregroundStyle(.white.opacity(0.5))
+                        Text("Already on the shelf: \(count)").font(.system(size: 11)).foregroundStyle(.white.opacity(0.5))
                     }
                 }
                 .foregroundStyle(targeted ? .white : .white.opacity(0.7))
@@ -386,7 +385,7 @@ struct HeaderRow: View {
                 Spacer(minLength: model.notch.width)
             } else {
                 TimelineView(.periodic(from: .now, by: 15)) { ctx in
-                    Text(ctx.date.formatted(.dateTime.weekday(.wide).day().month(.wide).locale(Locale(identifier: "he_IL"))))
+                    Text(ctx.date.formatted(.dateTime.weekday(.wide).day().month(.wide)))
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(.white.opacity(0.75))
                 }
@@ -413,7 +412,7 @@ struct HeaderRow: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(PressStyle())
-        .help(model.showMirror ? "סגור מראה" : "מראה")
+        .help(model.showMirror ? Text("Close mirror") : Text("Mirror"))
     }
 }
 
@@ -477,7 +476,7 @@ struct MediaCard: View {
         } else {
             VStack(spacing: 8) {
                 Image(systemName: "music.note").font(.system(size: 26)).foregroundStyle(.white.opacity(0.35))
-                Text("שום דבר לא מתנגן").font(.system(size: 13)).foregroundStyle(.white.opacity(0.5))
+                Text("Nothing playing").font(.system(size: 13)).foregroundStyle(.white.opacity(0.5))
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .frame(height: 104)
@@ -573,7 +572,7 @@ struct TimerCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("טיימר").font(.system(size: 11, weight: .semibold)).foregroundStyle(.white.opacity(0.5))
+            Text("Timer").font(.system(size: 11, weight: .semibold)).foregroundStyle(.white.opacity(0.5))
             if timer.isRunning {
                 TimelineView(.periodic(from: .now, by: 1)) { ctx in
                     ZStack {
@@ -590,7 +589,7 @@ struct TimerCard: View {
                 }
                 HStack(spacing: 6) {
                     Chip(title: "+1") { timer.add(minutes: 1) }
-                    Chip(title: "עצור", tint: .red) { timer.cancel() }
+                    Chip(title: "Stop", tint: .red) { timer.cancel() }
                 }
             } else {
                 HStack(spacing: 4) {
@@ -604,7 +603,7 @@ struct TimerCard: View {
                     StepButton(symbol: "play.fill", tint: .orange) { timer.start(minutes: Double(timer.customMinutes)) }
                 }
                 .environment(\.layoutDirection, .leftToRight)
-                .help("דקות — לחץ ▶ כדי להתחיל")
+                .help("Minutes — press ▶ to start")
                 HStack(spacing: 4) {
                     ForEach([1, 5, 10, 25], id: \.self) { m in
                         Chip(title: "\(m)", compact: true) { timer.start(minutes: Double(m)) }
@@ -635,7 +634,7 @@ struct StepButton: View {
 }
 
 struct Chip: View {
-    let title: String
+    let title: LocalizedStringKey
     var tint: Color = .orange
     var compact = false
     let action: () -> Void
@@ -661,7 +660,7 @@ struct ShelfCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("מדף").font(.system(size: 11, weight: .semibold)).foregroundStyle(.white.opacity(0.5))
+                Text("Shelf").font(.system(size: 11, weight: .semibold)).foregroundStyle(.white.opacity(0.5))
                 Spacer()
                 if !shelf.items.isEmpty {
                     Button {
@@ -671,8 +670,8 @@ struct ShelfCard: View {
                     }
                     .buttonStyle(.plain)
                     .foregroundStyle(.blue)
-                    .help("שלח הכול ב-AirDrop")
-                    Button("נקה") { shelf.clear() }
+                    .help("AirDrop everything")
+                    Button("Clear") { shelf.clear() }
                         .buttonStyle(.plain)
                         .font(.system(size: 11))
                         .foregroundStyle(.white.opacity(0.5))
@@ -686,7 +685,7 @@ struct ShelfCard: View {
                     .overlay {
                         VStack(spacing: 4) {
                             Image(systemName: "tray.and.arrow.down").font(.system(size: 18))
-                            Text("גרור לכאן קבצים").font(.system(size: 11))
+                            Text("Drop files here").font(.system(size: 11))
                         }
                         .foregroundStyle(.white.opacity(targeted ? 0.9 : 0.4))
                     }
@@ -726,11 +725,11 @@ struct ShelfItem: View {
         .onDrag { NSItemProvider(contentsOf: url) ?? NSItemProvider() }
         .onTapGesture(count: 2) { NSWorkspace.shared.open(url) }
         .contextMenu {
-            Button("פתח") { NSWorkspace.shared.open(url) }
-            Button("שלח ב-AirDrop") { shelf.airDrop([url]) }
-            Button("הצג ב-Finder") { NSWorkspace.shared.activateFileViewerSelecting([url]) }
+            Button("Open") { NSWorkspace.shared.open(url) }
+            Button("Send with AirDrop") { shelf.airDrop([url]) }
+            Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([url]) }
             Divider()
-            Button("הסר מהמדף") { shelf.remove(url) }
+            Button("Remove from shelf") { shelf.remove(url) }
         }
         .help(url.path)
     }
