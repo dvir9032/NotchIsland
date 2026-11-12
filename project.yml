@@ -1,0 +1,41 @@
+name: NotchIsland
+options:
+  bundleIdPrefix: com.dvir
+  deploymentTarget:
+    macOS: "15.0"
+settings:
+  base:
+    DEVELOPMENT_TEAM: TCFZVSJ8YB
+    CODE_SIGN_STYLE: Automatic
+    SWIFT_VERSION: "5.0"
+    SWIFT_STRICT_CONCURRENCY: minimal
+targets:
+  NIHelper:
+    type: library.dynamic
+    platform: macOS
+    sources: [NIHelper]
+    settings:
+      base:
+        PRODUCT_NAME: NIHelper
+        EXECUTABLE_PREFIX: ""
+        CLANG_ENABLE_OBJC_ARC: YES
+        OTHER_LDFLAGS: ["-framework", "Foundation"]
+  NotchIsland:
+    type: application
+    platform: macOS
+    sources: [NotchIsland]
+    dependencies:
+      - target: NIHelper
+        embed: true
+        link: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.dvir.NotchIsland
+        PRODUCT_NAME: NotchIsland
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        ENABLE_HARDENED_RUNTIME: NO
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: אי דינמי
+        INFOPLIST_KEY_LSUIElement: YES
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
