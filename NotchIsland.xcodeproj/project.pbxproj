@@ -265,7 +265,6 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "Notch Island";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Notch Island reads the address of the front Safari tab to AirDrop it or keep it on the shelf.";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Notch Island shows when headphones and other Bluetooth devices connect, with their battery level.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "The mirror in the notch shows the front camera only while you have it open.";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -435,7 +434,6 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "Notch Island";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Notch Island reads the address of the front Safari tab to AirDrop it or keep it on the shelf.";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Notch Island shows when headphones and other Bluetooth devices connect, with their battery level.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "The mirror in the notch shows the front camera only while you have it open.";
 				LD_RUNPATH_SEARCH_PATHS = (

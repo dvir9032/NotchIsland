@@ -22,16 +22,6 @@
         }
       }
     },
-    "NSAppleEventsUsageDescription": {
-      "localizations": {
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "האי קורא את הכתובת של הכרטיסייה הפתוחה בספארי כדי לשלוח אותה ב-AirDrop או לשמור אותה במדף."
-          }
-        }
-      }
-    },
     "NSBluetoothAlwaysUsageDescription": {
       "localizations": {
         "he": {

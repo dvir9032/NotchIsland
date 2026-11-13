@@ -12,16 +12,6 @@
         }
       }
     },
-    "AirDrop the current Safari tab": {
-      "localizations": {
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "שלח ב-AirDrop את הכרטיסייה הפתוחה בספארי"
-          }
-        }
-      }
-    },
     "Already on the shelf: %lld": {
       "localizations": {
         "he": {
@@ -128,16 +118,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "מהירות פתיחה במעבר עכבר"
-          }
-        }
-      }
-    },
-    "Keep the current Safari tab on the shelf": {
-      "localizations": {
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "שמור במדף את הכרטיסייה הפתוחה בספארי"
           }
         }
       }
@@ -298,16 +278,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "טיימר פעיל"
-          }
-        }
-      }
-    },
-    "Safari tab": {
-      "localizations": {
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "כרטיסייה"
           }
         }
       }
