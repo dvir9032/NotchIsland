@@ -65,7 +65,7 @@ struct IslandView: View {
         // The whole canvas takes drops, so near-misses around the island still land on the shelf.
         // The panel only accepts the mouse inside the controller's hover zone anyway.
         .contentShape(Rectangle())
-        .onDrop(of: [.fileURL], isTargeted: $model.dropTargeted) { model.shelf.handleDrop($0) }
+        .onDrop(of: [.fileURL, .url], isTargeted: $model.dropTargeted) { model.shelf.handleDrop($0) }
         .animation(.spring(response: 0.42, dampingFraction: 0.78), value: model.isOpen)
         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: model.activity)
         .preferredColorScheme(.dark)
@@ -310,7 +310,7 @@ struct AirDropZone: View {
             }
             .scaleEffect(targeted ? 1.03 : 1)
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: targeted)
-            .onDrop(of: [.fileURL], isTargeted: $targeted) { shelf.handleAirDropDrop($0) }
+            .onDrop(of: [.fileURL, .url], isTargeted: $targeted) { shelf.handleAirDropDrop($0) }
     }
 }
 
@@ -685,7 +685,7 @@ struct ShelfCard: View {
                     .overlay {
                         VStack(spacing: 4) {
                             Image(systemName: "tray.and.arrow.down").font(.system(size: 18))
-                            Text("Drop files here").font(.system(size: 11))
+                            Text("Drop files or links here").font(.system(size: 11))
                         }
                         .foregroundStyle(.white.opacity(targeted ? 0.9 : 0.4))
                     }
@@ -710,10 +710,10 @@ struct ShelfItem: View {
 
     var body: some View {
         VStack(spacing: 3) {
-            Image(nsImage: NSWorkspace.shared.icon(forFile: url.path))
+            Image(nsImage: Self.icon(for: url))
                 .resizable()
                 .frame(width: 40, height: 40)
-            Text(url.lastPathComponent)
+            Text(Self.name(for: url))
                 .font(.system(size: 9))
                 .lineLimit(1)
                 .truncationMode(.middle)
@@ -722,15 +722,30 @@ struct ShelfItem: View {
         }
         .padding(4)
         .contentShape(Rectangle())
-        .onDrag { NSItemProvider(contentsOf: url) ?? NSItemProvider() }
+        .onDrag { url.isFileURL ? NSItemProvider(contentsOf: url) ?? NSItemProvider() : NSItemProvider(object: url as NSURL) }
         .onTapGesture(count: 2) { NSWorkspace.shared.open(url) }
         .contextMenu {
             Button("Open") { NSWorkspace.shared.open(url) }
             Button("Send with AirDrop") { shelf.airDrop([url]) }
-            Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([url]) }
+            if url.isFileURL {
+                Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([url]) }
+            }
             Divider()
             Button("Remove from shelf") { shelf.remove(url) }
         }
-        .help(url.path)
+        .help(url.isFileURL ? url.path : url.absoluteString)
+    }
+
+    /// Files show their Finder icon; links show the browser that would open them.
+    static func icon(for url: URL) -> NSImage {
+        if url.isFileURL { return NSWorkspace.shared.icon(forFile: url.path) }
+        if let app = NSWorkspace.shared.urlForApplication(toOpen: url) { return NSWorkspace.shared.icon(forFile: app.path) }
+        return NSImage(systemSymbolName: "link", accessibilityDescription: nil) ?? NSImage()
+    }
+
+    static func name(for url: URL) -> String {
+        if url.isFileURL { return url.lastPathComponent }
+        let host = url.host() ?? url.absoluteString
+        return host.hasPrefix("www.") ? String(host.dropFirst(4)) : host
     }
 }

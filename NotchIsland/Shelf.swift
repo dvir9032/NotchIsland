@@ -9,7 +9,9 @@ final class Shelf: ObservableObject {
 
     init() {
         let paths = UserDefaults.standard.stringArray(forKey: key) ?? []
-        items = paths.map { URL(fileURLWithPath: $0) }.filter { FileManager.default.fileExists(atPath: $0.path) }
+        // Files are stored as paths, web links as full URL strings.
+        items = paths.compactMap { $0.hasPrefix("/") ? URL(fileURLWithPath: $0) : URL(string: $0) }
+            .filter { !$0.isFileURL || FileManager.default.fileExists(atPath: $0.path) }
     }
 
     func add(_ urls: [URL]) {
@@ -17,9 +19,9 @@ final class Shelf: ObservableObject {
         save()
     }
 
-    /// Forget files that were moved or deleted since they were parked.
+    /// Forget files that were moved or deleted since they were parked. Links always stay.
     func pruneMissing() {
-        let alive = items.filter { FileManager.default.fileExists(atPath: $0.path) }
+        let alive = items.filter { !$0.isFileURL || FileManager.default.fileExists(atPath: $0.path) }
         guard alive.count != items.count else { return }
         items = alive
         save()
@@ -55,7 +57,8 @@ final class Shelf: ObservableObject {
     }
 
     private static func loadURLs(_ providers: [NSItemProvider], then done: @escaping ([URL]) -> Void) -> Bool {
-        let fileProviders = providers.filter { $0.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) }
+        // public.url covers both files and web links (a Safari tab, an address-bar URL).
+        let fileProviders = providers.filter { $0.hasItemConformingToTypeIdentifier(UTType.url.identifier) }
         guard !fileProviders.isEmpty else { return false }
         let group = DispatchGroup()
         var urls: [URL] = []
@@ -72,6 +75,6 @@ final class Shelf: ObservableObject {
     }
 
     private func save() {
-        UserDefaults.standard.set(items.map(\.path), forKey: key)
+        UserDefaults.standard.set(items.map { $0.isFileURL ? $0.path : $0.absoluteString }, forKey: key)
     }
 }

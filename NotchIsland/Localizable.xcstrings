@@ -82,12 +82,12 @@
         }
       }
     },
-    "Drop files here": {
+    "Drop files or links here": {
       "localizations": {
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "גרור לכאן קבצים"
+            "value": "גרור לכאן קבצים או קישורים"
           }
         }
       }

@@ -12,8 +12,8 @@ Hover over the notch and it opens. When something is going on, a small live acti
 
 - **Now Playing** for any app: Music, Spotify, a browser tab, and others. You get the artwork, a progress bar you can drag to seek, and previous / play-pause / next controls. Click the artwork to jump to the player. While a song plays, bars tinted from the artwork bounce beside the notch.
 - **Timer**: pick any number of minutes with − / + or tap 1, 5, 10 or 25. The countdown shows beside the notch. A running timer survives quitting the app and restarting the Mac.
-- **Shelf**: drag files toward the notch. The island opens as soon as you get close and takes the drop. Drag them out again later, or double-click to open.
-- **AirDrop**: while you drag files, the island offers an AirDrop target next to the shelf. You can also AirDrop everything on the shelf in one click.
+- **Shelf**: drag files, or links such as a Safari tab, toward the notch. The island opens as soon as you get close and takes the drop. Drag them out again later, or double-click to open.
+- **AirDrop**: while you drag files or a Safari tab, the island offers an AirDrop target next to the shelf. You can also AirDrop everything on the shelf in one click.
 - **Battery**: a flash when the charger is plugged in, and warnings at 20%, 10% and 5%.
 - **Bluetooth**: AirPods and other devices show when they connect or disconnect, with battery when available.
 - **Trackpad gestures**: with the island open, swipe sideways over the player to change tracks, or swipe up to close.

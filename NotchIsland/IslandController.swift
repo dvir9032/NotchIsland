@@ -181,7 +181,8 @@ final class IslandController {
         }
         if !model.draggingFiles {
             let pb = NSPasteboard(name: .drag)
-            guard pb.changeCount != dragStartCount, pb.types?.contains(.fileURL) == true else { return }
+            // Files from Finder, or a tab / address-bar link from Safari and other browsers.
+            guard pb.changeCount != dragStartCount, let types = pb.types, types.contains(.fileURL) || types.contains(.URL) else { return }
             model.draggingFiles = true
         }
         track()
