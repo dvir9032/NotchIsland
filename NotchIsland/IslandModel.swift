@@ -19,6 +19,7 @@ final class IslandModel: ObservableObject {
     /// Slides the artwork after a swipe, as feedback.
     @Published var nudge: CGFloat = 0
     @Published var dropTargeted = false
+    @Published var airDropTargeted = false
     @Published var draggingFiles = false
     @Published private(set) var flash: Activity?
     @Published var notch: CGSize

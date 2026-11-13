@@ -9,7 +9,59 @@ final class IslandPanel: NSPanel {
 }
 
 final class IslandHostingView<Content: View>: NSHostingView<Content> {
+    /// Takes link drops SwiftUI refuses: a source that only offers "move", or an address dragged
+    /// as plain text. SwiftUI's drop asks for "copy" and URL types, so those would bounce off.
+    var fallbackHover: ((NSDraggingInfo?) -> Void)?
+    var fallbackDrop: ((NSDraggingInfo) -> Bool)?
+    private var usingFallback = false
+
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+
+    /// SwiftUI registers only the types its onDrop names, and re-registers on updates.
+    /// Keep files, links and plain-text addresses in the set whatever it asks for.
+    override func registerForDraggedTypes(_ newTypes: [NSPasteboard.PasteboardType]) {
+        let extra: [NSPasteboard.PasteboardType] = [.fileURL, .URL, .string]
+        super.registerForDraggedTypes(Array(Set(newTypes + extra)))
+    }
+
+    override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
+        route(super.draggingEntered(sender), sender)
+    }
+
+    override func draggingUpdated(_ sender: NSDraggingInfo) -> NSDragOperation {
+        route(super.draggingUpdated(sender), sender)
+    }
+
+    override func draggingExited(_ sender: NSDraggingInfo?) {
+        super.draggingExited(sender)
+        if usingFallback { fallbackHover?(nil) }
+        usingFallback = false
+    }
+
+    override func prepareForDragOperation(_ sender: NSDraggingInfo) -> Bool {
+        usingFallback || super.prepareForDragOperation(sender)
+    }
+
+    override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
+        guard usingFallback else { return super.performDragOperation(sender) }
+        fallbackHover?(nil)
+        return fallbackDrop?(sender) ?? false
+    }
+
+    override func concludeDragOperation(_ sender: NSDraggingInfo?) {
+        if usingFallback { usingFallback = false } else { super.concludeDragOperation(sender) }
+    }
+
+    private func route(_ swiftUI: NSDragOperation, _ sender: NSDraggingInfo) -> NSDragOperation {
+        guard swiftUI.isEmpty, fallbackDrop != nil, !Shelf.links(on: sender.draggingPasteboard).isEmpty else {
+            usingFallback = false
+            return swiftUI
+        }
+        usingFallback = true
+        fallbackHover?(sender)
+        let allowed = sender.draggingSourceOperationMask
+        return [NSDragOperation.copy, .link, .generic, .move].first { allowed.contains($0) } ?? []
+    }
 }
 
 /// Owns the transparent panel over the notch and decides when the island opens:
@@ -24,7 +76,9 @@ final class IslandController {
     private var closeWork: DispatchWorkItem?
     private var pinnedOpen = false
     private var dragPoll: Timer?
-    private var dragStartCount = 0
+    /// The drag pasteboard's changeCount while no button is held; a drag bumps it.
+    private var dragBaseline = NSPasteboard(name: .drag).changeCount
+    private var pressWatch: Timer?
     private var swipe = CGVector.zero
     private var swipeFired = false
     /// After a swipe-up closes the island, don't reopen it until the pointer leaves.
@@ -47,9 +101,13 @@ final class IslandController {
         panel.becomesKeyOnlyIfNeeded = true
         panel.acceptsMouseMovedEvents = true
         panel.ignoresMouseEvents = true
-        panel.contentView = IslandHostingView(rootView: IslandView(model: model))
+        let host = IslandHostingView(rootView: IslandView(model: model))
+        panel.contentView = host
         place()
         panel.orderFrontRegardless()
+        host.registerForDraggedTypes([])
+        host.fallbackHover = { [weak self] info in self?.dropHover(info) }
+        host.fallbackDrop = { [weak self] info in self?.dropLinks(info) ?? false }
         if UserDefaults.standard.bool(forKey: "debugOpen") { pinnedOpen = true; model.isOpen = true; panel.ignoresMouseEvents = false }
 
         let events: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged]
@@ -67,6 +125,17 @@ final class IslandController {
         if let d = NSEvent.addGlobalMonitorForEvents(matching: .leftMouseDown, handler: { [weak self] _ in self?.watchForDrag() }) {
             monitors.append(d)
         }
+        // Some drags never show a mouse-down to other apps, such as ones that start in a window's
+        // title bar, which the window server handles. A slow check of the button catches those.
+        pressWatch = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { [weak self] _ in
+            guard let self, self.dragPoll == nil else { return }
+            if NSEvent.pressedMouseButtons & 1 != 0 {
+                self.watchForDrag()
+            } else {
+                self.dragBaseline = NSPasteboard(name: .drag).changeCount
+            }
+        }
+        pressWatch?.tolerance = 0.1
         NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main) { [weak self] _ in
             self?.screenChanged()
         }
@@ -160,9 +229,35 @@ final class IslandController {
 
     // MARK: File drags
 
+    private func overAirDropZone(_ p: NSPoint) -> Bool {
+        // The AirDrop target is the trailing 170 pt of the open island's drop row.
+        let r = islandRect()
+        let inset = model.topRadius + 22
+        let rtl = NSApp.userInterfaceLayoutDirection == .rightToLeft
+        return rtl ? p.x < r.minX + inset + 170 : p.x > r.maxX - inset - 170
+    }
+
+    private func dropHover(_ info: NSDraggingInfo?) {
+        guard let info else {
+            model.dropTargeted = false
+            model.airDropTargeted = false
+            return
+        }
+        let air = model.isOpen && model.draggingFiles && overAirDropZone(panel.convertPoint(toScreen: info.draggingLocation))
+        model.airDropTargeted = air
+        model.dropTargeted = !air
+    }
+
+    private func dropLinks(_ info: NSDraggingInfo) -> Bool {
+        let urls = Shelf.links(on: info.draggingPasteboard)
+        let air = model.isOpen && model.draggingFiles && overAirDropZone(panel.convertPoint(toScreen: info.draggingLocation))
+        guard !urls.isEmpty else { return false }
+        air ? model.shelf.airDrop(urls) : model.shelf.add(urls)
+        return true
+    }
+
     private func watchForDrag() {
-        dragStartCount = NSPasteboard(name: .drag).changeCount
-        dragPoll?.invalidate()
+        guard dragPoll == nil else { return }
         dragPoll = Timer.scheduledTimer(withTimeInterval: 1 / 30, repeats: true) { [weak self] _ in self?.dragTick() }
     }
 
@@ -170,6 +265,7 @@ final class IslandController {
         guard NSEvent.pressedMouseButtons & 1 != 0 else {
             dragPoll?.invalidate()
             dragPoll = nil
+            dragBaseline = NSPasteboard(name: .drag).changeCount
             if model.draggingFiles {
                 // Let the drop land before the zone shrinks back.
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
@@ -181,8 +277,8 @@ final class IslandController {
         }
         if !model.draggingFiles {
             let pb = NSPasteboard(name: .drag)
-            // Files from Finder, or a tab / address-bar link from Safari and other browsers.
-            guard pb.changeCount != dragStartCount, let types = pb.types, types.contains(.fileURL) || types.contains(.URL) else { return }
+            // Files from Finder, or a link (an address-bar URL, a link in a page).
+            guard pb.changeCount != dragBaseline, Shelf.hasLinks(pb) else { return }
             model.draggingFiles = true
         }
         track()

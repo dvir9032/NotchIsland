@@ -254,7 +254,7 @@ struct ExpandedView: View {
             if model.draggingFiles {
                 HStack(spacing: 12) {
                     DropZone(targeted: model.dropTargeted, count: model.shelf.items.count)
-                    AirDropZone(shelf: model.shelf)
+                    AirDropZone(shelf: model.shelf, external: model.airDropTargeted)
                         .frame(width: 170)
                 }
                 .padding(.top, 10)
@@ -292,7 +292,10 @@ struct ExpandedView: View {
 
 struct AirDropZone: View {
     @ObservedObject var shelf: Shelf
-    @State private var targeted = false
+    /// Lit by the AppKit fallback for drops SwiftUI can't see (a Safari tab).
+    var external = false
+    @State private var swiftUITargeted = false
+    private var targeted: Bool { swiftUITargeted || external }
 
     var body: some View {
         RoundedRectangle(cornerRadius: 18, style: .continuous)
@@ -310,7 +313,7 @@ struct AirDropZone: View {
             }
             .scaleEffect(targeted ? 1.03 : 1)
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: targeted)
-            .onDrop(of: [.fileURL, .url], isTargeted: $targeted) { shelf.handleAirDropDrop($0) }
+            .onDrop(of: [.fileURL, .url], isTargeted: $swiftUITargeted) { shelf.handleAirDropDrop($0) }
     }
 }
 
@@ -699,8 +702,34 @@ struct ShelfCard: View {
                 }
                 .background(targeted ? Color.accentColor.opacity(0.12) : .clear, in: RoundedRectangle(cornerRadius: 10))
             }
+            if Shelf.safariRunning {
+                SafariTabRow(shelf: shelf)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+/// The front Safari tab, one tap away from AirDrop or the shelf.
+struct SafariTabRow: View {
+    @ObservedObject var shelf: Shelf
+    private static let icon: NSImage? = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.apple.Safari")
+        .map { NSWorkspace.shared.icon(forFile: $0.path) }
+
+    var body: some View {
+        HStack(spacing: 6) {
+            if let icon = Self.icon {
+                Image(nsImage: icon).resizable().frame(width: 16, height: 16)
+            }
+            Text("Safari tab").font(.system(size: 11)).foregroundStyle(.white.opacity(0.7)).lineLimit(1)
+                .fixedSize()
+                .layoutPriority(1)
+            Spacer(minLength: 0)
+            StepButton(symbol: "dot.radiowaves.up.forward", tint: .blue) { shelf.airDropSafariTab() }
+                .help(Text("AirDrop the current Safari tab"))
+            StepButton(symbol: "tray.and.arrow.down", tint: .white) { shelf.keepSafariTab() }
+                .help(Text("Keep the current Safari tab on the shelf"))
+        }
     }
 }
 
