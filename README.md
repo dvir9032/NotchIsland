@@ -1,39 +1,117 @@
-<p align="center"><img src="docs/icon.png" width="128" alt="Notch Island icon"></p>
+<p align="center"><img src="docs/icon.png" width="140" alt="Notch Island icon"></p>
 
 <h1 align="center">Notch Island</h1>
 
-<p align="center">A Dynamic Island for the MacBook notch. Native Swift, tiny, no accounts, no tracking.</p>
+<h3 align="center">Your MacBook's notch, finally pulling its weight.</h3>
 
-<p align="center"><img src="docs/screenshot-en.png" width="760" alt="Notch Island, open"></p>
+<p align="center">
+  A Dynamic Island for macOS: music, timers, files and AirDrop, living right where the notch is.<br>
+  Native, featherweight, private. And free.
+</p>
 
-Hover over the notch and it opens. When something is going on, a small live activity sits beside the notch, the way it does on iPhone.
+<p align="center">
+  <a href="https://github.com/dvir9032/NotchIsland/releases/latest"><img src="https://img.shields.io/github/v/release/dvir9032/NotchIsland?label=Download&style=for-the-badge&color=7c5cff&logo=apple&logoColor=white" alt="Download"></a>
+</p>
 
-## Features
+<p align="center">
+  <img src="https://img.shields.io/badge/macOS-15%2B-black?style=flat-square&logo=apple" alt="macOS 15+">
+  <img src="https://img.shields.io/badge/notarized-by%20Apple-2ea44f?style=flat-square" alt="Notarized by Apple">
+  <img src="https://img.shields.io/badge/size-2%20MB-blue?style=flat-square" alt="2 MB">
+  <img src="https://img.shields.io/github/license/dvir9032/NotchIsland?style=flat-square&color=lightgrey" alt="MIT license">
+</p>
 
-- **Now Playing** for any app: Music, Spotify, a browser tab, and others. You get the artwork, a progress bar you can drag to seek, and previous / play-pause / next controls. Click the artwork to jump to the player. While a song plays, bars tinted from the artwork bounce beside the notch.
-- **Timer**: pick any number of minutes with − / + or tap 1, 5, 10 or 25. The countdown shows beside the notch. A running timer survives quitting the app and restarting the Mac.
-- **Shelf**: drag files or links toward the notch. The island opens as soon as you get close and takes the drop. Drag them out again later, or double-click to open.
-- **AirDrop**: while you drag files or links, the island offers an AirDrop target next to the shelf. You can also AirDrop everything on the shelf in one click.
-- **Battery**: a flash when the charger is plugged in, and warnings at 20%, 10% and 5%.
-- **Bluetooth**: AirPods and other devices show when they connect or disconnect, with battery when available.
-- **Trackpad gestures**: with the island open, swipe sideways over the player to change tracks, or swipe up to close.
-- **Mirror**: a quick front-camera check before a call. The camera runs only while the mirror is open.
-- **Settings**: turn each live activity on or off and pick the hover speed. To open them, right-click the island, or launch the app again while it is running.
-- **English and Hebrew**: follows the system language, including right-to-left layout.
+<p align="center"><img src="docs/demo.gif" width="720" alt="Notch Island opening, closing and showing live activities"></p>
 
-Idle, the island draws nothing; the hardware notch is already black. With music playing it measured about 0% CPU, because the animation runs in Core Animation.
+---
 
-## Download
+## Meet your new notch
 
-Get **NotchIsland-1.0.zip** from [Releases](https://github.com/dvir9032/NotchIsland/releases/latest), unzip it, and drag **Notch Island** to Applications. It's signed with Developer ID and notarized by Apple, so it opens without warnings.
+The notch has been sitting at the top of your screen doing nothing. **Notch Island turns it into a live, glanceable hub**, the way the Dynamic Island works on iPhone.
 
-## Requirements
+Hover over it and it blooms open. When something's happening, like a song playing, a timer running or AirPods connecting, a small live activity sits beside the notch. When nothing is, it disappears completely: idle, it draws nothing at all.
 
-- A Mac with a notch: 14″ / 16″ MacBook Pro or 13″ / 15″ MacBook Air. On other Macs it shows as a small pill under the menu bar.
-- macOS 15 or later
-- Xcode 16+ and [XcodeGen](https://github.com/yonaskolb/XcodeGen) to build it yourself
+<p align="center"><img src="docs/live-activity.png" width="600" alt="Live activity beside the notch: album art and bouncing bars"></p>
 
-## Build
+## What it does
+
+| | |
+|---|---|
+| 🎵 **Now Playing, from anything** | Music, Spotify, YouTube in a browser: if it plays, the island shows it. Artwork, a scrubbable progress bar and controls, plus bars beside the notch that dance in the album's colors. |
+| ⏱ **A timer that's always in view** | Set any length with − / +, or tap 1, 5, 10 or 25. The countdown sits beside the notch and keeps going even through a restart. |
+| 🗂 **A shelf for your files** | Drag files or links toward the notch. The island opens to catch them. They wait there until you drag them out where you need them. |
+| 📡 **AirDrop in one move** | Drop a file on the island's AirDrop target and it's on its way to your iPhone. No Share menu, no Finder detour. |
+| 🎧 **AirPods & Bluetooth** | See when your headphones connect, with their battery level. |
+| 🔋 **Battery at a glance** | A flash of green when you plug in, and a heads-up at 20%, 10% and 5%. |
+| 👆 **Trackpad gestures** | Swipe sideways over the player to skip tracks. Swipe up to tuck the island away. |
+| 🪞 **Mirror** | Check your hair before the call. The camera turns on only while the mirror is open. |
+| ⚙️ **Make it yours** | Pick what shows beside the notch and how fast it opens. |
+
+<p align="center"><img src="docs/open.png" width="720" alt="Notch Island open: player, timer and shelf"></p>
+
+## Built to disappear
+
+- **~0% CPU.** Even while music plays, the animation runs on Core Animation, not your battery.
+- **Private by design.** No account, no analytics, no network calls. Your music and files never leave your Mac.
+- **Trusted.** Signed with Developer ID and notarized by Apple, so it opens without warnings.
+- **Tiny.** A 2 MB download, native Swift, no Electron.
+- **Feels like Apple made it.** Spring animations, a light overshoot on open, and content that blooms out of the notch and folds back into it.
+
+## Install in 30 seconds
+
+1. **[Download NotchIsland-1.0.zip](https://github.com/dvir9032/NotchIsland/releases/latest)**
+2. Unzip it and drag **Notch Island** to **Applications**.
+3. Open it and hover over your notch. ✨
+
+To start it with your Mac, right-click the island → **Settings…** → **Launch at login**.
+
+## FAQ
+
+<details>
+<summary><b>Is it really free?</b></summary>
+
+Yes. Notch Island is free and open source under the MIT license.
+</details>
+
+<details>
+<summary><b>Which Macs does it work on?</b></summary>
+
+Any Mac on macOS 15 or later. It shines on MacBooks with a notch (14″/16″ MacBook Pro, 13″/15″ MacBook Air). On other Macs it appears as a small pill under the menu bar.
+</details>
+
+<details>
+<summary><b>Does it work with Spotify / YouTube / Apple Music?</b></summary>
+
+Yes, with anything that shows up in macOS's Now Playing, including browser tabs.
+</details>
+
+<details>
+<summary><b>Why isn't it on the Mac App Store?</b></summary>
+
+Showing what's playing in any app needs a private macOS interface that the App Store doesn't allow. So Notch Island is distributed directly, signed and notarized by Apple.
+</details>
+
+<details>
+<summary><b>What permissions does it ask for?</b></summary>
+
+| Permission | Why |
+|---|---|
+| Bluetooth | To notice devices connecting, and read AirPods battery |
+| Camera | Only for the mirror, only while it's open |
+
+No Accessibility, no Screen Recording, no Full Disk Access.
+</details>
+
+## Love it?
+
+⭐ **Star the repo.** It helps other Mac users find Notch Island.
+Found a bug or have an idea? [Open an issue](https://github.com/dvir9032/NotchIsland/issues).
+
+---
+
+<details>
+<summary><b>For developers: build from source</b></summary>
+
+You need Xcode 16+ and [XcodeGen](https://github.com/yonaskolb/XcodeGen).
 
 ```bash
 brew install xcodegen
@@ -41,47 +119,32 @@ git clone https://github.com/dvir9032/NotchIsland.git
 cd NotchIsland
 ```
 
-In `project.yml`, set `DEVELOPMENT_TEAM` to your own Apple team ID. With a free account, use the team Xcode shows under Settings → Accounts. Then build:
+In `project.yml`, set `DEVELOPMENT_TEAM` to your own Apple team ID (Xcode → Settings → Accounts shows it). Then:
 
 ```bash
 xcodegen generate
 xcodebuild -project NotchIsland.xcodeproj -scheme NotchIsland -configuration Release -derivedDataPath build build
 cp -R build/Build/Products/Release/NotchIsland.app /Applications/
-open /Applications/NotchIsland.app
 ```
 
-To start it with your Mac, turn on "Launch at login" in Settings.
+`scripts/release.sh` builds the signed, notarized zip for a release.
+</details>
 
-## How Now Playing works on macOS 15.4+
+<details>
+<summary><b>For developers: how Now Playing works on macOS 15.4+</b></summary>
 
-Since macOS 15.4, the private MediaRemote framework returns nothing to apps that aren't Apple-signed. Notch Island ships a small helper library, `NIHelper.dylib`, that runs inside the system's `/usr/bin/perl`, which is Apple-signed. The helper loads it with `DynaLoader` and streams Now Playing updates to the app as JSON lines; commands go back over stdin. If the helper keeps failing, the app backs off and gives up instead of looping. [mediaremote-adapter](https://github.com/ungive/mediaremote-adapter) pioneered the same idea.
-
-## Permissions
-
-| Permission | Why |
-|---|---|
-| Bluetooth | To notice devices connecting, and read AirPods battery |
-| Camera | Only for the mirror, only while it is open |
-
-No Accessibility or Screen Recording permission is needed.
-
-## Project layout
+Since macOS 15.4, the private MediaRemote framework returns nothing to apps that aren't Apple-signed. Notch Island ships a small helper library, `NIHelper.dylib`, that runs inside the system's `/usr/bin/perl`, which is Apple-signed. The helper loads it with `DynaLoader` and streams Now Playing updates to the app as JSON lines; commands go back over stdin. If the helper keeps failing, the app backs off instead of looping. [mediaremote-adapter](https://github.com/ungive/mediaremote-adapter) pioneered the same idea.
 
 ```
 NotchIsland/          the app (SwiftUI + AppKit)
   IslandController    the panel over the notch, hover, drags and swipes
   IslandModel         state and which live activity wins
-  IslandView          all the UI
+  IslandView          all the UI and motion
   MediaController     talks to the perl-hosted Now Playing helper
   Battery, Bluetooth, IslandTimer, Shelf, Mirror, Settings
 NIHelper/             the MediaRemote bridge (Objective-C)
-scripts/make_icon.swift   draws the app icon
+scripts/              release.sh, make_icon.swift
 ```
+</details>
 
-## Credits
-
-Ideas from [boring.notch](https://github.com/TheBoredTeam/boring.notch), [Atoll](https://github.com/Ebullioscopic/Atoll) and [NotchDrop](https://github.com/Lakr233/NotchDrop). The code here is written from scratch.
-
-## License
-
-MIT. See [LICENSE](LICENSE).
+<p align="center"><sub>Inspired by <a href="https://github.com/TheBoredTeam/boring.notch">boring.notch</a>, <a href="https://github.com/Ebullioscopic/Atoll">Atoll</a> and <a href="https://github.com/Lakr233/NotchDrop">NotchDrop</a>. Written from scratch. MIT licensed.</sub></p>
