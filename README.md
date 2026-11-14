@@ -23,11 +23,15 @@ Hover over the notch and it opens. When something is going on, a small live acti
 
 Idle, the island draws nothing; the hardware notch is already black. With music playing it measured about 0% CPU, because the animation runs in Core Animation.
 
+## Download
+
+Get **NotchIsland-1.0.zip** from [Releases](https://github.com/dvir9032/NotchIsland/releases/latest), unzip it, and drag **Notch Island** to Applications. It's signed with Developer ID and notarized by Apple, so it opens without warnings.
+
 ## Requirements
 
 - A Mac with a notch: 14″ / 16″ MacBook Pro or 13″ / 15″ MacBook Air. On other Macs it shows as a small pill under the menu bar.
 - macOS 15 or later
-- Xcode 16+ and [XcodeGen](https://github.com/yonaskolb/XcodeGen) to build
+- Xcode 16+ and [XcodeGen](https://github.com/yonaskolb/XcodeGen) to build it yourself
 
 ## Build
 
