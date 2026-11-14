@@ -30,6 +30,13 @@ struct NotchShape: Shape {
 struct IslandView: View {
     @ObservedObject var model: IslandModel
 
+    static let openSpring = Animation.spring(duration: 0.5, bounce: 0.24)
+    static let closeSpring = Animation.spring(duration: 0.32, bounce: 0.04)
+
+    /// The open content stays mounted while the island closes, so the shrinking shape clips it
+    /// (a removed view isn't clipped) and there's never an empty black box. Dropped once closed.
+    @State private var showsExpanded = false
+
     var body: some View {
         let size = model.size
         let shape = NotchShape(top: model.topRadius, bottom: model.bottomRadius)
@@ -38,15 +45,24 @@ struct IslandView: View {
                 .fill(Color.black)
                 // Idle, the hardware notch is already black; drawing over it only shows our outline.
                 .opacity(model.isOpen || model.activity != nil ? 1 : 0)
-                .shadow(color: .black.opacity(model.isOpen ? 0.5 : 0), radius: 16, y: 8)
+                .shadow(color: .black.opacity(model.isOpen ? 0.55 : 0), radius: model.isOpen ? 18 : 0, y: model.isOpen ? 10 : 0)
             Group {
-                if model.isOpen {
+                if showsExpanded || model.isOpen {
+                    // Grows out of the notch with the shape; on close it fades while the shrinking
+                    // island swallows it.
                     ExpandedView(model: model)
-                        .transition(.asymmetric(insertion: .opacity.animation(.easeOut(duration: 0.25).delay(0.08)),
-                                                removal: .opacity.animation(.easeIn(duration: 0.1))))
+                        .opacity(model.isOpen ? 1 : 0)
+                        .scaleEffect(model.isOpen ? 1 : 0.94, anchor: .top)
+                        .transition(.asymmetric(
+                            insertion: .islandContent.animation(.spring(duration: 0.42, bounce: 0.18).delay(0.04)),
+                            removal: .identity))
                 } else if let a = model.activity {
+                    // Keyed by activity, so switching (music → charging) morphs instead of swapping.
                     CompactView(model: model, activity: a)
-                        .transition(.opacity.animation(.easeInOut(duration: 0.2)))
+                        .id(a)
+                        .transition(.asymmetric(
+                            insertion: .wings.animation(.spring(duration: 0.4, bounce: 0.2).delay(0.05)),
+                            removal: .wings.animation(.easeIn(duration: 0.14))))
                 }
             }
             .frame(width: size.width, height: size.height, alignment: .top)
@@ -66,9 +82,72 @@ struct IslandView: View {
         // The panel only accepts the mouse inside the controller's hover zone anyway.
         .contentShape(Rectangle())
         .onDrop(of: [.fileURL, .url], isTargeted: $model.dropTargeted) { model.shelf.handleDrop($0) }
-        .animation(.spring(response: 0.42, dampingFraction: 0.78), value: model.isOpen)
-        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: model.activity)
+        // Opening overshoots a touch, like iPhone's island; closing settles without a bounce.
+        .animation(model.isOpen ? Self.openSpring : Self.closeSpring, value: model.isOpen)
+        .onAppear { showsExpanded = model.isOpen }
+        .onChange(of: model.isOpen) { _, open in
+            if open {
+                showsExpanded = true
+            } else {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.34) {
+                    if !model.isOpen { showsExpanded = false }
+                }
+            }
+        }
+        .animation(.spring(duration: 0.45, bounce: 0.22), value: model.activity)
         .preferredColorScheme(.dark)
+    }
+}
+
+// MARK: - Motion
+
+/// Content of the open island: grows from the notch (top-anchored), sharpening as it lands.
+struct IslandContentMotion: ViewModifier {
+    let shown: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .scaleEffect(x: shown ? 1 : 0.9, y: shown ? 1 : 0.72, anchor: .top)
+            .blur(radius: shown ? 0 : 10)
+            .opacity(shown ? 1 : 0)
+    }
+}
+
+/// Live-activity wings: spread out sideways from the notch.
+struct WingsMotion: ViewModifier {
+    let shown: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .scaleEffect(x: shown ? 1 : 0.7, y: shown ? 1 : 0.85, anchor: .center)
+            .blur(radius: shown ? 0 : 6)
+            .opacity(shown ? 1 : 0)
+    }
+}
+
+extension AnyTransition {
+    static var islandContent: AnyTransition {
+        .modifier(active: IslandContentMotion(shown: false), identity: IslandContentMotion(shown: true))
+    }
+
+    static var wings: AnyTransition {
+        .modifier(active: WingsMotion(shown: false), identity: WingsMotion(shown: true))
+    }
+}
+
+/// Cards of the open island settle in one after another, a beat apart.
+struct StaggeredEntrance: ViewModifier {
+    let index: Int
+    @State private var shown = false
+
+    func body(content: Content) -> some View {
+        content
+            .opacity(shown ? 1 : 0)
+            .offset(y: shown ? 0 : -8)
+            .blur(radius: shown ? 0 : 3)
+            .onAppear {
+                withAnimation(.spring(duration: 0.45, bounce: 0.2).delay(0.08 + Double(index) * 0.05)) { shown = true }
+            }
     }
 }
 
@@ -260,29 +339,35 @@ struct ExpandedView: View {
                 .padding(.top, 10)
                 .padding(.bottom, 18)
                 .padding(.horizontal, 22)
+                .transition(.blurReplace)
             } else if model.showMirror {
                 MirrorCard(model: model)
                     .padding(.top, 6)
                     .padding(.bottom, 16)
                     .padding(.horizontal, 16)
+                    .transition(.blurReplace)
             } else {
                 cards
+                    .transition(.blurReplace)
             }
         }
         .padding(.horizontal, model.topRadius)
         .foregroundStyle(.white)
-        .animation(.easeOut(duration: 0.18), value: model.draggingFiles)
+        .animation(.spring(duration: 0.35, bounce: 0.15), value: model.draggingFiles)
     }
 
     private var cards: some View {
             HStack(alignment: .top, spacing: 16) {
                 MediaCard(media: model.media, nudge: model.nudge)
                     .frame(width: 300)
+                    .modifier(StaggeredEntrance(index: 0))
                 Divider().overlay(Color.white.opacity(0.08))
                 TimerCard(timer: model.timer)
                     .frame(width: 118)
+                    .modifier(StaggeredEntrance(index: 1))
                 Divider().overlay(Color.white.opacity(0.08))
                 ShelfCard(shelf: model.shelf, targeted: model.dropTargeted)
+                    .modifier(StaggeredEntrance(index: 2))
             }
             .padding(.top, 12)
             .padding(.bottom, 18)

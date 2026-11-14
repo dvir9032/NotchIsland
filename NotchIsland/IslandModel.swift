@@ -3,7 +3,7 @@ import Combine
 import ServiceManagement
 
 final class IslandModel: ObservableObject {
-    enum Activity: Equatable {
+    enum Activity: Hashable {
         case music, timer, charging, lowBattery, timerDone, bluetooth
     }
 

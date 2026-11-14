@@ -109,6 +109,20 @@ final class IslandController {
         host.fallbackHover = { [weak self] info in self?.dropHover(info) }
         host.fallbackDrop = { [weak self] info in self?.dropLinks(info) ?? false }
         if UserDefaults.standard.bool(forKey: "debugOpen") { pinnedOpen = true; model.isOpen = true; panel.ignoresMouseEvents = false }
+        // `-debugCycle YES`: open, close, then flash a live activity, on a loop, for recording the motion.
+        if UserDefaults.standard.bool(forKey: "debugCycle") {
+            pinnedOpen = true
+            var step = 0
+            Timer.scheduledTimer(withTimeInterval: 1.5, repeats: true) { [weak self] _ in
+                guard let self else { return }
+                switch step % 3 {
+                case 0: self.model.isOpen = true
+                case 1: self.model.isOpen = false
+                default: self.model.show(.charging, for: 1.2)
+                }
+                step += 1
+            }
+        }
 
         let events: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged]
         if let g = NSEvent.addGlobalMonitorForEvents(matching: events, handler: { [weak self] _ in self?.track() }) {
@@ -334,7 +348,7 @@ final class IslandController {
                 let w = DispatchWorkItem { [weak self] in
                     guard let self else { return }
                     self.closeWork = nil
-                    withAnimation { self.model.isOpen = false }
+                    self.model.isOpen = false  // IslandView owns the close spring
                     self.model.dropTargeted = false
                 }
                 closeWork = w
