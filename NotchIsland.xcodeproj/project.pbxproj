@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0E13124122E5BEF609266149 /* NIHelper.dylib in Embed Dependencies */ = {isa = PBXBuildFile; fileRef = E60E1F51C88C8499D70625F9 /* NIHelper.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2BCC9071114AE36FE2980A46 /* Bluetooth.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1419F970EA6A2B622166C3D /* Bluetooth.swift */; };
-		49F16612662CE22BAD367186 /* NIHelper.dylib in Resources */ = {isa = PBXBuildFile; fileRef = E60E1F51C88C8499D70625F9 /* NIHelper.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		501DFAF927EBDBB28A7746C1 /* MediaController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F69ED8B674B990874EB94E63 /* MediaController.swift */; };
 		59BBA8CF4E0E76D9952C1C73 /* IslandModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC8DC3815868478810D97B0 /* IslandModel.swift */; };
 		5F547DA20D3669A575315FCE /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 6581F98A43E30FDAFE441698 /* InfoPlist.xcstrings */; };
@@ -35,6 +35,20 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		743D97322A6AF59BDE77B819 /* Embed Dependencies */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				0E13124122E5BEF609266149 /* NIHelper.dylib in Embed Dependencies */,
+			);
+			name = "Embed Dependencies";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		016B74E2AB0BE35D2E997D9A /* IslandController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandController.swift; sourceTree = "<group>"; };
 		3FC8DC3815868478810D97B0 /* IslandModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandModel.swift; sourceTree = "<group>"; };
@@ -45,6 +59,7 @@
 		6581F98A43E30FDAFE441698 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		6B2DF1E331583B63DEF6B302 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		6B5D4FABA6D88E245D979CB8 /* IslandTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslandTimer.swift; sourceTree = "<group>"; };
+		6D2ED653400D1F05D50A1B57 /* NotchIsland.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NotchIsland.entitlements; sourceTree = "<group>"; };
 		C1419F970EA6A2B622166C3D /* Bluetooth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bluetooth.swift; sourceTree = "<group>"; };
 		D6D6C8DA954DF3BCC5CFC007 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		DA8B071114DD66CBF0C3D84E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -97,6 +112,7 @@
 				6B2DF1E331583B63DEF6B302 /* Localizable.xcstrings */,
 				F69ED8B674B990874EB94E63 /* MediaController.swift */,
 				E957B131A72AF57478AA6FE5 /* Mirror.swift */,
+				6D2ED653400D1F05D50A1B57 /* NotchIsland.entitlements */,
 				F712EADB0C5F6B711C404FA1 /* Settings.swift */,
 				65529F977D8D961C3031CD48 /* Shelf.swift */,
 			);
@@ -112,6 +128,7 @@
 			buildPhases = (
 				AA966F3684CEAD4ECD02EC0D /* Sources */,
 				6699DF2CE096347DF16E4C2E /* Resources */,
+				743D97322A6AF59BDE77B819 /* Embed Dependencies */,
 			);
 			buildRules = (
 			);
@@ -190,7 +207,6 @@
 				9C16CAD617A56672701FF3C9 /* Assets.xcassets in Resources */,
 				5F547DA20D3669A575315FCE /* InfoPlist.xcstrings in Resources */,
 				A61D3E34DF5BCCF94D6B42F6 /* Localizable.xcstrings in Resources */,
-				49F16612662CE22BAD367186 /* NIHelper.dylib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -251,6 +267,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.dvir.NIHelper;
 				PRODUCT_NAME = NIHelper;
 				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};
@@ -258,9 +275,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = NotchIsland/NotchIsland.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Notch Island";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
@@ -315,6 +332,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = TCFZVSJ8YB;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -381,6 +399,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = TCFZVSJ8YB;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -420,6 +439,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.dvir.NIHelper;
 				PRODUCT_NAME = NIHelper;
 				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
 			};
 			name = Debug;
 		};
@@ -427,9 +447,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = NotchIsland/NotchIsland.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Notch Island";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";

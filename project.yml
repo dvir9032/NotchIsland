@@ -10,6 +10,8 @@ settings:
     CODE_SIGN_STYLE: Automatic
     SWIFT_VERSION: "5.0"
     SWIFT_STRICT_CONCURRENCY: minimal
+    # Notarization needs the hardened runtime on every binary, the helper dylib included.
+    ENABLE_HARDENED_RUNTIME: YES
 targets:
   NIHelper:
     type: library.dynamic
@@ -19,6 +21,7 @@ targets:
       base:
         PRODUCT_NAME: NIHelper
         EXECUTABLE_PREFIX: ""
+        SKIP_INSTALL: YES  # ships inside the app; installed on its own it turns the archive generic
         CLANG_ENABLE_OBJC_ARC: YES
         OTHER_LDFLAGS: ["-framework", "Foundation"]
   NotchIsland:
@@ -29,6 +32,8 @@ targets:
       - target: NIHelper
         embed: true
         link: false
+        copy:
+          destination: frameworks
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.dvir.NotchIsland
@@ -36,7 +41,7 @@ targets:
         PRODUCT_NAME: NotchIsland
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
-        ENABLE_HARDENED_RUNTIME: NO
+        CODE_SIGN_ENTITLEMENTS: NotchIsland/NotchIsland.entitlements
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Notch Island
         INFOPLIST_KEY_LSUIElement: YES

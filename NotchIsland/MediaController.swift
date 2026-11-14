@@ -47,7 +47,7 @@ final class MediaController: ObservableObject {
 
     func start() {
         guard process == nil else { return }
-        guard let lib = Bundle.main.url(forResource: "NIHelper", withExtension: "dylib"),
+        guard let lib = Bundle.main.privateFrameworksURL?.appendingPathComponent("NIHelper.dylib"),
               FileManager.default.fileExists(atPath: lib.path) else {
             NSLog("NotchIsland: NIHelper.dylib not found")
             return
